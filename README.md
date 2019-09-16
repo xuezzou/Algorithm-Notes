@@ -7,11 +7,11 @@
 - [Binary Search & log(n) Algorithm](#binary-search-logn-algorithm)
 - [Binary Tree - Divide & Traverse](#binary-tree-divide-traverse)
 - [Two-pointer](#two-pointer)
-- Combination-based DFS
-- Permutation-based & Graph-based DFS
-- Data Structure - Stack, Queue, Hash, Heap
-- Data Structure - Interval, Array, Matrix & Binary Indexed Tree
-- Additional - Dynamic Programming
+- [Combination-based DFS]()
+- [Permutation-based & Graph-based DFS]()
+- [Data Structure - Stack, Queue, Hash, Heap]()
+- [Data Structure - Interval, Array, Matrix & Binary Indexed Tree]()
+- [Additional - Dynamic Programming]()
 - [Others](#Others)
  
 ---
@@ -1032,7 +1032,7 @@
         
         // iterative solution
         // while(root) {
-        //     if(abs(res - target) > abs(root->val- target)) {
+        //     if(abs(res - target) > abs(root->val - target)) {
         //         res = root->val;
         //     }
         //     root = target > root->val ? root->right : root->left;
@@ -2520,9 +2520,9 @@ public:
         for(int i = 0; i < str.length(); ++i) {
             ++vis[str[i] - 'a'];
         }
-        for(int i = 0; i<26 ;++i) {
-            if(vis[i] == 1) {
-                return i + 'a';
+        for(int i = 0; i<str.length() ;++i) {
+            if(vis[str[i] - 'a'] == 1) {
+                return str[i];
             }
         }
         return ' ';
@@ -2957,6 +2957,73 @@ public:
 ```
 13. [LRU Cache](https://www.lintcode.com/problem/lru-cache/description?_from=ladder&&fromId=1)
 ```c++
+struct KeyValue {
+    int val;
+    int key;
+    KeyValue * next;
+    KeyValue * prev;
+    KeyValue(int key, int val): key(key), val(val), prev(nullptr), next(nullptr) {}
+};
+
+class LRUCache {
+private: 
+    void moveToTail(KeyValue * cur) {
+        // KeyValue * curCopy = cur;
+        if(cur == tail) {
+            return;
+        }
+        cur->prev->next = cur->next;
+        cur->next->prev = cur->prev;
+        tail->next = cur;
+        cur->prev = tail;
+        cur->next = nullptr;
+        tail = cur;
+    }
+    KeyValue * head, * tail;
+    unordered_map<int, KeyValue*> hash;
+    int capacity, size;
+    
+public:
+    LRUCache(int capacity): capacity(capacity), size(0){
+        // dummy node
+        head = new KeyValue(0, 0);
+        tail = head;
+    }
+    
+    int get(int key) {
+        if (!hash.count(key)) {
+            return -1;
+        }
+        moveToTail(hash[key]);
+        return hash[key]->val;
+    }
+    
+    void set(int key, int value) {
+        if(hash.count(key)) {
+            KeyValue * cur = hash[key];
+            cur->val = value;
+            moveToTail(cur);
+            return;
+        } 
+        if(size < capacity) {
+            KeyValue * cur = new KeyValue(key, value);
+            hash[key] = cur;
+            tail->next = cur;
+            cur->prev = tail;
+            tail = cur;
+            ++size;
+        } else {
+            // delete first node and assume size always >= 1
+            KeyValue * first = head->next;
+            hash.erase(first->key);
+            first->key = key;
+            first->val = value;
+            hash[key] = first;
+            moveToTail(first);
+        }
+    }   
+};
+
 // version without prev ptr
 class KeyValue {
 public:
@@ -3446,7 +3513,7 @@ i        // father here represents the preceding position
         return result;
     }
 ```
-2. [Subarray Sum]https://www.lintcode.com/problem/subarray-sum/description?_from=ladder&&fromId=1()
+2. [Subarray Sum](https://www.lintcode.com/problem/subarray-sum/description?_from=ladder&&fromId=1)
 ```c++
     vector<int> subarraySum(vector<int> &nums) {
         unordered_map<int, int> hash; // find sum 0
@@ -3528,7 +3595,7 @@ public:
         }
         
         vector<Pair> sums;
-        sums.push_back(Pair(-1, 0));
+        sums.push_back(Pair(-1, 0)); // important!
         int sum = 0;
         for(int i = 0; i < nums.size(); ++i) {
             sum += nums[i];
@@ -3541,11 +3608,11 @@ public:
             std::cout<<a.sum<<std::endl;
         }
         // compute closest sum
-        int minDis = INT_MAX;
+        int minDis = sums[1].sum - sums[0].sum;
         Pair minPair = sums[0];
-        Pair maxPair = sums[0];
+        Pair maxPair = sums[1];
         
-        for(int i = 0; i < nums.size(); ++i) {
+        for(int i = 1; i < nums.size(); ++i) {
             int diff = sums[i + 1].sum - sums[i].sum;
             if(diff < minDis) {
                 minDis = diff;
@@ -4182,7 +4249,7 @@ void inOrder(struct Node *root)
         /* we have visited the node and its 
            left subtree.  Now, it's right 
            subtree's turn */
-        curr = curr->right; r
+        curr = curr->right; 
   
     } /* end of while */
 } 
@@ -4905,13 +4972,137 @@ class SpiralIdeonePrint {
 [Pythagorean Triplet in an array](https://www.geeksforgeeks.org/find-pythagorean-triplet-in-an-unsorted-array/)
 - could square and sort and then apply two sum 
 
-- javascript
-    - interpreted unlike c compiled
-    - modern use feature of compiler
-    - dynamic weakly typed
-    - high level
-    - multi-paradigm
-    - prototypical inheritance
-    - single-threaded
-    - event loop call stack and heap https://www.youtube.com/watch?v=8aGhZQkoFbQ
-    - everything in js is an object
+
+
+[Subarray Sum Equals K](https://www.lintcode.com/problem/subarray-sum-equals-k/description?_from=ladder&&fromId=96)
+```c++
+    int subarraySumEqualsK(vector<int> &nums, int k) {
+        unordered_map<int, int> preSum;
+        preSum[0] = 1;
+        int sum = 0, res = 0;
+        for(int num: nums) {
+            sum += num;
+            res += preSum.count(sum - k);
+            ++preSum[sum];
+        }
+        return res;
+    }
+```
+
+[Find duplicates in O(n) time and O(1) extra space](https://www.geeksforgeeks.org/find-duplicates-in-on-time-and-constant-extra-space/)
+
+[Sorted Array to Balanced BST]()
+```c++
+    TreeNode* sortedArrayToBST(vector<int>& nums) {
+        return helper(nums, 0 , (int)nums.size() - 1);
+    }
+    TreeNode* helper(vector<int>& nums, int left, int right) {
+        if (left > right) return NULL;
+        int mid = left + (right - left) / 2;
+        TreeNode *cur = new TreeNode(nums[mid]);
+        cur->left = helper(nums, left, mid - 1);
+        cur->right = helper(nums, mid + 1, right);
+        return cur;
+    }
+```
+[Sorted Linked List to Balanced BST](https://www.geeksforgeeks.org/sorted-linked-list-to-balanced-bst/)
+```c++
+     TreeNode* sortedListToBST(ListNode* head) {
+        if (!head) return NULL;
+        return helper(head, NULL);
+    }
+    TreeNode* helper(ListNode* head, ListNode* tail) {
+        if (head == tail) return NULL;
+        ListNode *slow = head, *fast = head;
+        while (fast != tail && fast->next != tail) {
+            slow = slow->next;
+            fast = fast->next->next;
+        }
+        TreeNode *cur = new TreeNode(slow->val);
+        cur->left = helper(head, slow);
+        cur->right = helper(slow->next, tail);
+        return cur;
+    }
+```
+[Sort List](https://www.lintcode.com/problem/sort-list/description)
+```c++
+    ListNode* sortList(ListNode* head) {
+        if(!head || !head->next) {
+            return head;
+        }
+        ListNode * slow = head, * fast = head->next;
+        while(fast && fast->next) {
+            slow = slow->next;
+            fast = fast->next->next;
+        }
+        ListNode * headRight = slow->next;
+        slow->next = nullptr;
+        ListNode * left = sortList(head);
+        ListNode * right = sortList(headRight);
+        return merge(left, right);
+    }
+    
+    ListNode* merge(ListNode* l1, ListNode* l2) {
+        ListNode *dummy = new ListNode(-1);
+        ListNode *cur = dummy;
+        while (l1 && l2) {
+            if (l1->val < l2->val) {
+                cur->next = l1;
+                l1 = l1->next;
+            } else {
+                cur->next = l2;
+                l2 = l2->next;
+            }
+            cur = cur->next;
+        }
+        if (l1){
+            cur->next = l1;
+        } 
+        if (l2) {
+            cur->next = l2;
+        }
+        return dummy->next;
+    }
+```
+
+[Find the smallest positive number missing from an unsorted array](https://www.geeksforgeeks.org/find-the-smallest-positive-number-missing-from-an-unsorted-array/)
+    - To mark presence of an element x, we change the value at the index x to negative
+
+[Binary Tree Maximum Path Sum](https://www.lintcode.com/problem/binary-tree-maximum-path-sum/description)
+```c++
+class Solution {
+private:
+    class ResultType {
+    public:
+        int singlePath, maxPath;
+        ResultType(int singlePath, int maxPath): singlePath(singlePath), maxPath(maxPath) {}
+    };
+public:
+    /**
+     * @param root: The root of binary tree.
+     * @return: An integer
+     */
+    int maxPathSum(TreeNode * root) {
+        ResultType result = helper(root);
+        return result.maxPath;
+    }
+    
+    ResultType helper(TreeNode * curRoot) {
+        if(!curRoot) {
+            return ResultType(0, INT_MIN); // have to be INT_MIN or {-1} would return 0 which is not we want 
+        }
+        // Divide
+        ResultType left = helper(curRoot->left);
+        ResultType right = helper(curRoot->right);
+
+        // Conquer
+        int singlePath = max(left.singlePath, right.singlePath) + curRoot->val;
+        singlePath = max(singlePath, 0);
+
+        int maxPath = max(left.maxPath, right.maxPath);
+        maxPath = max(maxPath, left.singlePath + right.singlePath + curRoot->val);
+
+        return ResultType(singlePath, maxPath);
+    }
+};
+```
