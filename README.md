@@ -4,8 +4,8 @@
 #### Content
 - [Hack the Algorithm Interview](#hack-the-algorithm-interview)
 - [Breadth First Search](#breadth-first-search)
-- [Binary Search & log(n) Algorithm](#binary-search-logn-algorithm)
-- [Binary Tree - Divide & Traverse](#binary-tree-divide-traverse)
+- [Binary Search & log(n) Algorithm](#binary-search--logn-algorithm)
+- [Binary Tree - Divide & Traverse](#binary-tree---divide--traverse)
 - [Two-pointer](#two-pointer)
 - [Implicit Graph DFS](#implicit-graph-dfs)
 - [Data Structure - Stack, Queue, Hash, Heap](#hash--heap)
