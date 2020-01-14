@@ -7,16 +7,16 @@
 - [Binary Search & log(n) Algorithm](#binary-search-logn-algorithm)
 - [Binary Tree - Divide & Traverse](#binary-tree-divide-traverse)
 - [Two-pointer](#two-pointer)
-- [Combination-based DFS]()
-- [Permutation-based & Graph-based DFS]()
-- [Data Structure - Stack, Queue, Hash, Heap]()
-- [Data Structure - Interval, Array, Matrix & Binary Indexed Tree]()
-- [Additional - Dynamic Programming]()
-- [Others](#Others)
+- [Implicit Graph DFS](#implicit-graph-dfs)
+- [Data Structure - Stack, Queue, Hash, Heap](#hash--heap)
+- [Memorization Search & Dynamic Programming](#memorization-search--dynamic-programming)
+- [DP](#dp)
+- [Additional Problems](#additional-problems)
+- [Others](#others)
  
 ---
 
-#### Hack the Algorithm Interview
+### Hack the Algorithm Interview
 1. [Longest Palindrome](https://www.lintcode.com/problem/longest-palindrome/description?_from=ladder&&fromId=1)
     ```c++
     /**
@@ -132,7 +132,7 @@
     }
     ```
 
-#### Breadth First Search
+### Breadth First Search
 1. [Number of Islands](https://www.lintcode.com/problem/number-of-islands/description?_from=ladder&&fromId=1)
     ```c++
     int numIslands(vector<vector<bool>> &grid) {
@@ -223,450 +223,450 @@
         }
     ```
 3. [Course Schedule](https://www.lintcode.com/problem/course-schedule/?_from=ladder&&fromId=1)
-```c++
-    /*
-     * @param numCourses: a total of n courses
-     * @param prerequisites: a list of prerequisite pairs
-     * @return: true if can finish all courses or false
-     */
-    bool canFinish(int numCourses, vector<pair<int, int>>& prerequisites) {
-        return bfs_topological_sort(numCourses, prerequisites);
-        // return dfs_no_cycle(numCourses, prerequisites);
-    }
-    
-    // reference: https://www.geeksforgeeks.org/detect-cycle-direct-graph-using-colors/
-    bool dfs_no_cycle(int numCourses, vector<pair<int, int>> & prereq) {
-        // first build the graph
-        vector<unordered_set<int>> out_edges(numCourses);
-        for(int i = 0; i < prereq.size(); ++i) {
-            out_edges[prereq[i].second].insert(prereq[i].first);
-        }
-        vector<int> color(numCourses, 0);
-        for(int i = 0; i < numCourses; ++i) {
-            if(color[i] == 0) {
-                if(has_cycle(i, out_edges, color)) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-    
-    // 0 represents not visited and 1 represnts current being processed
-    // 2 represented finished it is being processed (and no need to do it again)
-    // related to BACK EDGE, forming a back edge leads to a cycle
-    bool has_cycle(int curNode, vector<unordered_set<int>> & out_edges, vector<int> & color) {
-        color[curNode] = 1;
-        for(unordered_set<int>::iterator it = out_edges[curNode].begin(); it != out_edges[curNode].end(); ++it) {
-            if(color[*it] == 2) {
-                continue;
-            }
-            if(color[*it] == 1) {
-                return true;
-            }
-            if(has_cycle(*it, out_edges, color)) {
-                return true;
-            }
-        }
-        color[curNode] = 2;
-        return false;
-    }
-
-    bool bfs_topological_sort(int numCourses, vector<pair<int, int>> & prereq) {
-        vector<unordered_set<int>> out_edges(numCourses); // sucessors b<-a
-        vector<int> indegree(numCourses, 0);
-        for(int i = 0; i < prereq.size(); ++i) {
-            out_edges[prereq[i].second].insert(prereq[i].first);
-        }
-        // take the indegree part out to avoid duplication
-        for(int i = 0; i < numCourses;++i) {
-            for(unordered_set<int>::iterator it = out_edges[i].begin(); it != out_edges[i].end(); ++it) {
-                ++indegree[*it];
-            }
-        }
-        queue<int> queue;
-        // find indegree 0
-        for(int i = 0; i < numCourses; ++i) {
-            if(indegree[i] == 0) {
-                queue.push(i);
-            }
-        }
-        int node = 0;
-        // pop element out of the queue and find the next indegree 0 and minus its outedges' indegree by 1
-        while(!queue.empty()) {
-            int cur = queue.front();
-            queue.pop();
-            ++node;
-            for(unordered_set<int>::iterator it = out_edges[cur].begin(); it != out_edges[cur].end(); ++it) {
-                if(--indegree[*it] == 0) {
-                    queue.push(*it);
-                }
-            }
-        }
-        return numCourses == node;
-    }
-```
-4. [Course Schedule II](https://www.lintcode.com/problem/course-schedule-ii/description?_from=ladder&&fromId=1)
-```c++
-    vector<int> findOrder(int numCourses, vector<pair<int, int>> &prerequisites) {
-        vector<unordered_set<int>> outEdges(numCourses);
-        vector<int> indegree(numCourses, 0);
-        
-        vector<int> coursesOrdered;
-        
-        for(int i = 0; i < prerequisites.size(); ++i) {
-            outEdges[prerequisites[i].second].insert(prerequisites[i].first);
+    ```c++
+        /*
+         - @param numCourses: a total of n courses
+         - @param prerequisites: a list of prerequisite pairs
+         - @return: true if can finish all courses or false
+         */
+        bool canFinish(int numCourses, vector<pair<int, int>>& prerequisites) {
+            return bfs_topological_sort(numCourses, prerequisites);
+            // return dfs_no_cycle(numCourses, prerequisites);
         }
         
-        for(int i = 0; i < numCourses; ++i) {
-            for(unordered_set<int>::iterator it = outEdges[i].begin(); it != outEdges[i].end(); ++it){
-                ++indegree[*it];
+        // reference: https://www.geeksforgeeks.org/detect-cycle-direct-graph-using-colors/
+        bool dfs_no_cycle(int numCourses, vector<pair<int, int>> & prereq) {
+            // first build the graph
+            vector<unordered_set<int>> out_edges(numCourses);
+            for(int i = 0; i < prereq.size(); ++i) {
+                out_edges[prereq[i].second].insert(prereq[i].first);
             }
-        }
-        
-        int node = 0;
-        queue<int> queue;
-        for(int i = 0; i < numCourses; ++i) {
-            if(indegree[i] == 0) {
-                queue.push(i);
-            }
-        }
-        
-        while(!queue.empty()) {
-            int curNode = queue.front();
-            queue.pop();
-            ++node;
-            coursesOrdered.push_back(curNode);
-            for(unordered_set<int>::iterator it = outEdges[curNode].begin(); it != outEdges[curNode].end(); ++it){
-                if(--indegree[*it] == 0) {
-                    queue.push(*it);
-                }
-            }
-            
-        }
-        
-        if(node != numCourses) {
-            return {};
-        } else {
-            return coursesOrdered;
-        }
-    }
-```
-5. [Knight Shortest Path](https://www.lintcode.com/problem/knight-shortest-path/description?_from=ladder&&fromId=1)
-```c++
-    vector<vector<int>> directions = {{-2, -1}, {-2, 1}, {-1, 2}, {1, 2}, {2, 1}, {2, -1}, {1, -2}, {-1, -2}};
-
-    int shortestPath(vector<vector<bool>> &grid, Point &source, Point &destination) {
-        int step = 0;
-        
-        queue<Point> queue;
-        queue.push(source);
-        while(!queue.empty()){
-            int size = queue.size();
-            while(--size >= 0) {
-                Point curPoint = queue.front();
-                queue.pop();
-                if(curPoint.x == destination.x && curPoint.y == destination.y) {
-                    return step;
-                }
-                for(int i = 0; i < directions.size(); ++i) {
-                    Point newPoint = Point(curPoint.x + directions[i][0], curPoint.y + directions[i][1]);
-                    if(valid(newPoint, grid)) {
-                        queue.push(newPoint);
-                        grid[newPoint.x][newPoint.y] = 1;
+            vector<int> color(numCourses, 0);
+            for(int i = 0; i < numCourses; ++i) {
+                if(color[i] == 0) {
+                    if(has_cycle(i, out_edges, color)) {
+                        return false;
                     }
                 }
             }
-            ++step;
-        }
-        return -1;
-    }
-
-    bool valid(Point & point, vector<vector<bool>> &grid) {
-        return point.x >= 0 && point.y >= 0 && point.x < grid.size() && point.y < grid[0].size() && grid[point.x][point.y] == 0;
-    }
-```
-6. [Sequence Reconstruction](https://www.lintcode.com/problem/sequence-reconstruction/description?_from=ladder&&fromId=1)
-```c++
-    /**
-     * @param org: a permutation of the integers from 1 to n
-     * @param seqs: a list of sequences
-     * @return: true if it can be reconstructed only one or false
-     */
-    bool sequenceReconstruction(vector<int> &org, vector<vector<int>> &seqs) {
-        // edge cases
-        int numCourses = org.size();
-        if(numCourses == 0) {
-            return seqs.size() == 0 || seqs[0].size() == 0;
-        }
-        if(numCourses== 1) {
-            return seqs.size() == 1 && seqs[0].size() == 1 && seqs[0][0] == org[0];
+            return true;
         }
         
-        // first construct the graph from seqs
-        vector<unordered_set<int>> graph(numCourses + 1);
-       
-        for(int i = 0; i < seqs.size(); ++i) {
-            for(int j = 1; j < seqs[i].size(); ++j){
-                // to make sure number in seqs are valid
-                if(seqs[i][j] <= 0 || seqs[i][j] > numCourses ) {
-                    return false;
+        // 0 represents not visited and 1 represnts current being processed
+        // 2 represented finished it is being processed (and no need to do it again)
+        // related to BACK EDGE, forming a back edge leads to a cycle
+        bool has_cycle(int curNode, vector<unordered_set<int>> & out_edges, vector<int> & color) {
+            color[curNode] = 1;
+            for(unordered_set<int>::iterator it = out_edges[curNode].begin(); it != out_edges[curNode].end(); ++it) {
+                if(color[*it] == 2) {
+                    continue;
                 }
-                graph[seqs[i][j - 1]].insert(seqs[i][j]);
-            }
-        }
-        
-        // compute indegree
-        vector<int> indegree(numCourses + 1, 0);
-        for(int i = 1; i < numCourses + 1; ++i) {
-            for(unordered_set<int>::iterator it = graph[i].begin(); it != graph[i].end(); ++it){
-                ++indegree[*it];
-            }
-        }
-        
-        // perform topological sorting
-        queue<int> queue;
-        // find degree w/ 0
-        for(int i = 1; i < numCourses + 1; ++i) {
-            if(indegree[i] == 0){
-                queue.push(i);
-            }
-        }
-            
-        int node = 0;
-        while(queue.size() == 1) {
-            int cur = queue.front();
-            queue.pop();
-            if(org[node++] != cur) {
-                return false;
-            }
-            // minus 1 from all adjacent
-            for(unordered_set<int>::iterator it = graph[cur].begin(); it != graph[cur].end(); ++it) {
-                if(--indegree[*it] == 0) {
-                    queue.push(*it);
+                if(color[*it] == 1) {
+                    return true;
+                }
+                if(has_cycle(*it, out_edges, color)) {
+                    return true;
                 }
             }
+            color[curNode] = 2;
+            return false;
         }
-        return node == numCourses;
-    }
-```
-7. [Clone Graph](https://www.lintcode.com/problem/clone-graph/description?_from=ladder&&fromId=1)
-```c++
-/**
- * Definition for undirected graph.
- * struct UndirectedGraphNode {
- *     int label;
- *     vector<UndirectedGraphNode *> neighbors;
- *     UndirectedGraphNode(int x) : label(x) {};
- * };
- */
-```
-```c++
-    UndirectedGraphNode* cloneGraph(UndirectedGraphNode* node) {
-        // some points
-        // map is from the existed one to the copied but one not vise versa
-        // can only create it when queue it or lose linking
-        // only queue it if not created before -> dead loop
-        // remember to link it back even if it is created before
-        if(!node) {
-            return node;
-        }
-        // copy root first
-        // build a map to map the node being copied and copied ones to avoid multiple copies
-        UndirectedGraphNode* root_c = new UndirectedGraphNode(node->label);
-        unordered_map<UndirectedGraphNode*, UndirectedGraphNode*> copy;
-        copy[node] = root_c;
-        
-        // queue to build bfs
-        queue<UndirectedGraphNode*> todo;
-        todo.push(node);
-        
-        while(!todo.empty()) {
-            UndirectedGraphNode* cur = todo.front();
-            todo.pop();
-            for(UndirectedGraphNode * neighbor: cur->neighbors) {
-                if(!copy.count(neighbor)) {
-                    UndirectedGraphNode * newNeighbor = new UndirectedGraphNode(neighbor->label);
-                    copy[neighbor] = newNeighbor;
-                    todo.push(neighbor);
-                } 
-                copy[cur]->neighbors.push_back(copy[neighbor]);
+
+        bool bfs_topological_sort(int numCourses, vector<pair<int, int>> & prereq) {
+            vector<unordered_set<int>> out_edges(numCourses); // sucessors b<-a
+            vector<int> indegree(numCourses, 0);
+            for(int i = 0; i < prereq.size(); ++i) {
+                out_edges[prereq[i].second].insert(prereq[i].first);
             }
-        }
-        
-        return root_c;
-    }
-```
-8. [Topological Sorting](https://www.lintcode.com/problem/topological-sorting/description?_from=ladder&&fromId=1)
-```c++
-/**
- * Definition for Directed graph.
- * struct DirectedGraphNode {
- *     int label;
- *     vector<DirectedGraphNode *> neighbors;
- *     DirectedGraphNode(int x) : label(x) {};
- * };
- */
-```
-```c++
-    vector<DirectedGraphNode*> topSort(vector<DirectedGraphNode*>& graph) {
-        // bfs
-        // counting degree
-        unordered_map<DirectedGraphNode*, int> indegree;
-        for(DirectedGraphNode* node: graph) {
-            for(DirectedGraphNode* neighbor: node->neighbors) {
-                ++indegree[neighbor];
-            }
-        }
-        
-        // initailzie a queue and find degree 0
-        queue<DirectedGraphNode*> queue;
-        // important: not contain in the map if indegree is 0!!!
-        queue<DirectedGraphNode *> queue;
-        for(DirectedGraphNode* node: graph) {
-            if(!indegree.count(node)) {
-                queue.push(node);
-            }
-        }
-        vector<DirectedGraphNode*> result;
-        while(!queue.empty()) {
-            DirectedGraphNode * cur = queue.front();
-            queue.pop();
-            result.push_back(cur);
-            // explore its adjacency
-            for(DirectedGraphNode* neighbor: cur->neighbors) {
-                if(--indegree[neighbor] == 0) {
-                    queue.push(neighbor);
+            // take the indegree part out to avoid duplication
+            for(int i = 0; i < numCourses;++i) {
+                for(unordered_set<int>::iterator it = out_edges[i].begin(); it != out_edges[i].end(); ++it) {
+                    ++indegree[*it];
                 }
             }
-            
-        }
-        return result;
-    }
-```
-9. [Serialize and Deserialize Binary Tree](https://www.lintcode.com/problem/serialize-and-deserialize-binary-tree/description?_from=ladder&&fromId=1)
-```c++
-    string serialize(TreeNode * root) {
-        if(root == nullptr) {
-            return "{}";
-        }
-        // build the result string using bfs
-        string result = "";
-        queue<TreeNode*> queue;
-        queue.push(root);
-        while(!queue.empty()) {
-            // int size = queue.size();
-            // for(int i = 0; i < size; ++i) {
-                if (queue.front() == nullptr) {
-                    result += "#,";
-                    queue.pop();
-                } else {
-                    TreeNode* cur = queue.front();
-                    queue.pop();
-                    result += std::to_string(cur->val) + ",";
-                    
-                    queue.push(cur->left);
-                    queue.push(cur->right);
+            queue<int> queue;
+            // find indegree 0
+            for(int i = 0; i < numCourses; ++i) {
+                if(indegree[i] == 0) {
+                    queue.push(i);
                 }
-        }
-        result[result.length() - 1] = '}';
-        return "{" + result;
-    }
-
-    /**
-     * This method will be invoked second, the argument data is what exactly
-     * you serialized at method "serialize", that means the data is not given by
-     * system, it's given by your own serialize method. So the format of data is
-     * designed by yourself, and deserialize it here as you serialize it in 
-     * "serialize" method.
-     */
-    TreeNode * deserialize(string &data) {
-        if(data == "{}") {
-            return nullptr;
-        }
-
-        queue<TreeNode*> queue;
-        vector<string> tree;
-        // going through the string and build the tree stored in a vector
-        for(int i = 1, j = 1; i < data.length(); ++i){
-            if(data[i] == ',' || data[i] == '}') {
-                // build it here
-                string val = data.substr(j, i - j);
-                j = i + 1;
-                tree.push_back(val);
-            } 
-        }
-
-        int index = 0;
-        TreeNode* root = new TreeNode(stoi(tree[index++]));
-        queue.push(root);
-        while(!queue.empty()) {
-            TreeNode* curNode = queue.front();
-            queue.pop();
-            if(tree[index] != "#"){
-                curNode->left = new TreeNode(stoi(tree[index++]));
-                queue.push(curNode->left);
-            } else {
-                curNode->left = nullptr;
-                ++index;
             }
-            if(tree[index] != "#"){
-                curNode->right = new TreeNode(stoi(tree[index++]));
-                queue.push(curNode->right);
-            } else {
-                curNode->right = nullptr;
-                ++index;
-            }
-        }
-        return root;
-    }
-```
-10. [Word Ladder](https://www.lintcode.com/problem/word-ladder/?_from=ladder&&fromId=1)
-```c++
-    int ladderLength(string &start, string &end, unordered_set<string> &dict) {
-        // edge case
-        if(start == end) {
-            return 1;
-        }
-        if(start.length() == 0 || start.length() != end.length()) {
-            return 0;
-        }
-        int word_size = start.length();
-        queue<string> queue;
-        queue.push(start);
-        int step = 1;
-        while(!queue.empty()) {
-            int level_size = queue.size();
-            ++step;
-            while(level_size-- > 0) {
-                string cur_word = queue.front();
+            int node = 0;
+            // pop element out of the queue and find the next indegree 0 and minus its outedges' indegree by 1
+            while(!queue.empty()) {
+                int cur = queue.front();
                 queue.pop();
-                for(int i = 0; i < word_size; ++i){
-                    char old_ch = cur_word[i];
-                    for(char new_ch = 'a'; new_ch <= 'z'; ++new_ch) {
-                        if(new_ch != old_ch) {
-                            cur_word[i] = new_ch;
-                            if(cur_word == end) {
-                                return step;
-                            }
-                            if(dict.find(cur_word) != dict.end()) {
-                                queue.push(cur_word);
-                                dict.erase(cur_word);
-                            }
-                            
+                ++node;
+                for(unordered_set<int>::iterator it = out_edges[cur].begin(); it != out_edges[cur].end(); ++it) {
+                    if(--indegree[*it] == 0) {
+                        queue.push(*it);
+                    }
+                }
+            }
+            return numCourses == node;
+        }
+    ```
+4. [Course Schedule II](https://www.lintcode.com/problem/course-schedule-ii/description?_from=ladder&&fromId=1)
+    ```c++
+        vector<int> findOrder(int numCourses, vector<pair<int, int>> &prerequisites) {
+            vector<unordered_set<int>> outEdges(numCourses);
+            vector<int> indegree(numCourses, 0);
+            
+            vector<int> coursesOrdered;
+            
+            for(int i = 0; i < prerequisites.size(); ++i) {
+                outEdges[prerequisites[i].second].insert(prerequisites[i].first);
+            }
+            
+            for(int i = 0; i < numCourses; ++i) {
+                for(unordered_set<int>::iterator it = outEdges[i].begin(); it != outEdges[i].end(); ++it){
+                    ++indegree[*it];
+                }
+            }
+            
+            int node = 0;
+            queue<int> queue;
+            for(int i = 0; i < numCourses; ++i) {
+                if(indegree[i] == 0) {
+                    queue.push(i);
+                }
+            }
+            
+            while(!queue.empty()) {
+                int curNode = queue.front();
+                queue.pop();
+                ++node;
+                coursesOrdered.push_back(curNode);
+                for(unordered_set<int>::iterator it = outEdges[curNode].begin(); it != outEdges[curNode].end(); ++it){
+                    if(--indegree[*it] == 0) {
+                        queue.push(*it);
+                    }
+                }
+                
+            }
+            
+            if(node != numCourses) {
+                return {};
+            } else {
+                return coursesOrdered;
+            }
+        }
+    ```
+5. [Knight Shortest Path](https://www.lintcode.com/problem/knight-shortest-path/description?_from=ladder&&fromId=1)
+    ```c++
+        vector<vector<int>> directions = {{-2, -1}, {-2, 1}, {-1, 2}, {1, 2}, {2, 1}, {2, -1}, {1, -2}, {-1, -2}};
+
+        int shortestPath(vector<vector<bool>> &grid, Point &source, Point &destination) {
+            int step = 0;
+            
+            queue<Point> queue;
+            queue.push(source);
+            while(!queue.empty()){
+                int size = queue.size();
+                while(--size >= 0) {
+                    Point curPoint = queue.front();
+                    queue.pop();
+                    if(curPoint.x == destination.x && curPoint.y == destination.y) {
+                        return step;
+                    }
+                    for(int i = 0; i < directions.size(); ++i) {
+                        Point newPoint = Point(curPoint.x + directions[i][0], curPoint.y + directions[i][1]);
+                        if(valid(newPoint, grid)) {
+                            queue.push(newPoint);
+                            grid[newPoint.x][newPoint.y] = 1;
                         }
                     }
-                    cur_word[i] = old_ch;
+                }
+                ++step;
+            }
+            return -1;
+        }
+
+        bool valid(Point & point, vector<vector<bool>> &grid) {
+            return point.x >= 0 && point.y >= 0 && point.x < grid.size() && point.y < grid[0].size() && grid[point.x][point.y] == 0;
+        }
+    ```
+6. [Sequence Reconstruction](https://www.lintcode.com/problem/sequence-reconstruction/description?_from=ladder&&fromId=1)
+    ```c++
+        /**
+         - @param org: a permutation of the integers from 1 to n
+         - @param seqs: a list of sequences
+         - @return: true if it can be reconstructed only one or false
+         */
+        bool sequenceReconstruction(vector<int> &org, vector<vector<int>> &seqs) {
+            // edge cases
+            int numCourses = org.size();
+            if(numCourses == 0) {
+                return seqs.size() == 0 || seqs[0].size() == 0;
+            }
+            if(numCourses== 1) {
+                return seqs.size() == 1 && seqs[0].size() == 1 && seqs[0][0] == org[0];
+            }
+            
+            // first construct the graph from seqs
+            vector<unordered_set<int>> graph(numCourses + 1);
+           
+            for(int i = 0; i < seqs.size(); ++i) {
+                for(int j = 1; j < seqs[i].size(); ++j){
+                    // to make sure number in seqs are valid
+                    if(seqs[i][j] <= 0 || seqs[i][j] > numCourses ) {
+                        return false;
+                    }
+                    graph[seqs[i][j - 1]].insert(seqs[i][j]);
                 }
             }
+            
+            // compute indegree
+            vector<int> indegree(numCourses + 1, 0);
+            for(int i = 1; i < numCourses + 1; ++i) {
+                for(unordered_set<int>::iterator it = graph[i].begin(); it != graph[i].end(); ++it){
+                    ++indegree[*it];
+                }
+            }
+            
+            // perform topological sorting
+            queue<int> queue;
+            // find degree w/ 0
+            for(int i = 1; i < numCourses + 1; ++i) {
+                if(indegree[i] == 0){
+                    queue.push(i);
+                }
+            }
+                
+            int node = 0;
+            while(queue.size() == 1) {
+                int cur = queue.front();
+                queue.pop();
+                if(org[node++] != cur) {
+                    return false;
+                }
+                // minus 1 from all adjacent
+                for(unordered_set<int>::iterator it = graph[cur].begin(); it != graph[cur].end(); ++it) {
+                    if(--indegree[*it] == 0) {
+                        queue.push(*it);
+                    }
+                }
+            }
+            return node == numCourses;
         }
-        return 0;
-    }
-```
+    ```
+7. [Clone Graph](https://www.lintcode.com/problem/clone-graph/description?_from=ladder&&fromId=1)
+    ```c++
+    /**
+     - Definition for undirected graph.
+     - struct UndirectedGraphNode {
+     -     int label;
+     -     vector<UndirectedGraphNode *> neighbors;
+     -     UndirectedGraphNode(int x) : label(x) {};
+     - };
+     */
+    ```
+    ```c++
+        UndirectedGraphNode* cloneGraph(UndirectedGraphNode* node) {
+            // some points
+            // map is from the existed one to the copied but one not vise versa
+            // can only create it when queue it or lose linking
+            // only queue it if not created before -> dead loop
+            // remember to link it back even if it is created before
+            if(!node) {
+                return node;
+            }
+            // copy root first
+            // build a map to map the node being copied and copied ones to avoid multiple copies
+            UndirectedGraphNode* root_c = new UndirectedGraphNode(node->label);
+            unordered_map<UndirectedGraphNode*, UndirectedGraphNode*> copy;
+            copy[node] = root_c;
+            
+            // queue to build bfs
+            queue<UndirectedGraphNode*> todo;
+            todo.push(node);
+            
+            while(!todo.empty()) {
+                UndirectedGraphNode* cur = todo.front();
+                todo.pop();
+                for(UndirectedGraphNode * neighbor: cur->neighbors) {
+                    if(!copy.count(neighbor)) {
+                        UndirectedGraphNode * newNeighbor = new UndirectedGraphNode(neighbor->label);
+                        copy[neighbor] = newNeighbor;
+                        todo.push(neighbor);
+                    } 
+                    copy[cur]->neighbors.push_back(copy[neighbor]);
+                }
+            }
+            
+            return root_c;
+        }
+    ```
+8. [Topological Sorting](https://www.lintcode.com/problem/topological-sorting/description?_from=ladder&&fromId=1)
+    ```c++
+    /**
+     - Definition for Directed graph.
+     - struct DirectedGraphNode {
+     -     int label;
+     -     vector<DirectedGraphNode *> neighbors;
+     -     DirectedGraphNode(int x) : label(x) {};
+     - };
+     */
+    ```
+    ```c++
+        vector<DirectedGraphNode*> topSort(vector<DirectedGraphNode*>& graph) {
+            // bfs
+            // counting degree
+            unordered_map<DirectedGraphNode*, int> indegree;
+            for(DirectedGraphNode* node: graph) {
+                for(DirectedGraphNode* neighbor: node->neighbors) {
+                    ++indegree[neighbor];
+                }
+            }
+            
+            // initailzie a queue and find degree 0
+            queue<DirectedGraphNode*> queue;
+            // important: not contain in the map if indegree is 0!!!
+            queue<DirectedGraphNode *> queue;
+            for(DirectedGraphNode* node: graph) {
+                if(!indegree.count(node)) {
+                    queue.push(node);
+                }
+            }
+            vector<DirectedGraphNode*> result;
+            while(!queue.empty()) {
+                DirectedGraphNode * cur = queue.front();
+                queue.pop();
+                result.push_back(cur);
+                // explore its adjacency
+                for(DirectedGraphNode* neighbor: cur->neighbors) {
+                    if(--indegree[neighbor] == 0) {
+                        queue.push(neighbor);
+                    }
+                }
+                
+            }
+            return result;
+        }
+    ```
+9. [Serialize and Deserialize Binary Tree](https://www.lintcode.com/problem/serialize-and-deserialize-binary-tree/description?_from=ladder&&fromId=1)
+    ```c++
+        string serialize(TreeNode * root) {
+            if(root == nullptr) {
+                return "{}";
+            }
+            // build the result string using bfs
+            string result = "";
+            queue<TreeNode*> queue;
+            queue.push(root);
+            while(!queue.empty()) {
+                // int size = queue.size();
+                // for(int i = 0; i < size; ++i) {
+                    if (queue.front() == nullptr) {
+                        result += "#,";
+                        queue.pop();
+                    } else {
+                        TreeNode* cur = queue.front();
+                        queue.pop();
+                        result += std::to_string(cur->val) + ",";
+                        
+                        queue.push(cur->left);
+                        queue.push(cur->right);
+                    }
+            }
+            result[result.length() - 1] = '}';
+            return "{" + result;
+        }
+
+        /**
+         - This method will be invoked second, the argument data is what exactly
+         - you serialized at method "serialize", that means the data is not given by
+         - system, it's given by your own serialize method. So the format of data is
+         - designed by yourself, and deserialize it here as you serialize it in 
+         - "serialize" method.
+         */
+        TreeNode * deserialize(string &data) {
+            if(data == "{}") {
+                return nullptr;
+            }
+
+            queue<TreeNode*> queue;
+            vector<string> tree;
+            // going through the string and build the tree stored in a vector
+            for(int i = 1, j = 1; i < data.length(); ++i){
+                if(data[i] == ',' || data[i] == '}') {
+                    // build it here
+                    string val = data.substr(j, i - j);
+                    j = i + 1;
+                    tree.push_back(val);
+                } 
+            }
+
+            int index = 0;
+            TreeNode* root = new TreeNode(stoi(tree[index++]));
+            queue.push(root);
+            while(!queue.empty()) {
+                TreeNode* curNode = queue.front();
+                queue.pop();
+                if(tree[index] != "#"){
+                    curNode->left = new TreeNode(stoi(tree[index++]));
+                    queue.push(curNode->left);
+                } else {
+                    curNode->left = nullptr;
+                    ++index;
+                }
+                if(tree[index] != "#"){
+                    curNode->right = new TreeNode(stoi(tree[index++]));
+                    queue.push(curNode->right);
+                } else {
+                    curNode->right = nullptr;
+                    ++index;
+                }
+            }
+            return root;
+        }
+    ```
+10. [Word Ladder](https://www.lintcode.com/problem/word-ladder/?_from=ladder&&fromId=1)
+    ```c++
+        int ladderLength(string &start, string &end, unordered_set<string> &dict) {
+            // edge case
+            if(start == end) {
+                return 1;
+            }
+            if(start.length() == 0 || start.length() != end.length()) {
+                return 0;
+            }
+            int word_size = start.length();
+            queue<string> queue;
+            queue.push(start);
+            int step = 1;
+            while(!queue.empty()) {
+                int level_size = queue.size();
+                ++step;
+                while(level_size-- > 0) {
+                    string cur_word = queue.front();
+                    queue.pop();
+                    for(int i = 0; i < word_size; ++i){
+                        char old_ch = cur_word[i];
+                        for(char new_ch = 'a'; new_ch <= 'z'; ++new_ch) {
+                            if(new_ch != old_ch) {
+                                cur_word[i] = new_ch;
+                                if(cur_word == end) {
+                                    return step;
+                                }
+                                if(dict.find(cur_word) != dict.end()) {
+                                    queue.push(cur_word);
+                                    dict.erase(cur_word);
+                                }
+                                
+                            }
+                        }
+                        cur_word[i] = old_ch;
+                    }
+                }
+            }
+            return 0;
+        }
+    ```
 
 ---
 
-#### Binary Search & logN Algorithm
+### Binary Search & logN Algorithm
 1. [Last Position of Target](https://www.lintcode.com/problem/last-position-of-target/description?_from=ladder&&fromId=1)
     ```c++
     /**
@@ -987,874 +987,875 @@
     }
     ```
 12.[Search a 2D Matrix II](https://www.lintcode.com/problem/search-a-2d-matrix-ii/description?_from=ladder&&fromId=1)
-```c++
-/**
-     * @param matrix: A list of lists of integers
-     * @param target: An integer you want to search in matrix
-     * @return: An integer indicate the total occurrence of target in the given matrix
-     */
-    int searchMatrix(vector<vector<int>> &matrix, int target) {
-        int row = matrix.size();
-        if(row == 0) {
-            return 0;
-        } 
-        int col = matrix[0].size();
-        if(col == 0) {
-            return 0;
-        }
-        int count = 0;
-        int  curRow = row - 1, curCol = 0;
-        while(curRow >= 0 && curCol < col) {
-            if(target == matrix[curRow][curCol]) {
-                ++count;
-                --curRow;
-                ++curCol;
-            } else if(target < matrix[curRow][curCol]) {
-                --curRow;
-            } else {
-                ++curCol;
+    ```c++
+    /**
+         - @param matrix: A list of lists of integers
+         - @param target: An integer you want to search in matrix
+         - @return: An integer indicate the total occurrence of target in the given matrix
+         */
+        int searchMatrix(vector<vector<int>> &matrix, int target) {
+            int row = matrix.size();
+            if(row == 0) {
+                return 0;
+            } 
+            int col = matrix[0].size();
+            if(col == 0) {
+                return 0;
             }
+            int count = 0;
+            int  curRow = row - 1, curCol = 0;
+            while(curRow >= 0 && curCol < col) {
+                if(target == matrix[curRow][curCol]) {
+                    ++count;
+                    --curRow;
+                    ++curCol;
+                } else if(target < matrix[curRow][curCol]) {
+                    --curRow;
+                } else {
+                    ++curCol;
+                }
+            }
+            return count;
         }
-        return count;
-    }
-```
+    ```
+
 
 ---
 
-#### Binary Tree - Divide & Traverse
+### Binary Tree - Divide & Traverse
 1. [Closest Binary Search Tree Value](https://www.lintcode.com/problem/closest-binary-search-tree-value/description?_from=ladder&&fromId=1)
-```c++
-    int closestValue(TreeNode * root, double target) {
-        if(root == nullptr) {
-            return -1;
-        }
-        int res = root->val;
-        
-        // iterative solution
-        // while(root) {
-        //     if(abs(res - target) > abs(root->val - target)) {
-        //         res = root->val;
-        //     }
-        //     root = target > root->val ? root->right : root->left;
-        // }
-        
-        // recursion below
-        if(root->right && target > root->val) {
-            int r = closestValue(root->right, target);
-            if(abs(res - target) > abs(r- target)) {
-                res = r;
+    ```c++
+        int closestValue(TreeNode * root, double target) {
+            if(root == nullptr) {
+                return -1;
             }
-        } else if(root->left && target < root->val) {
-            int l = closestValue(root->left, target);
-            if(abs(res - target) > abs(l- target)) {
-                res = l;
+            int res = root->val;
+            
+            // iterative solution
+            // while(root) {
+            //     if(abs(res - target) > abs(root->val - target)) {
+            //         res = root->val;
+            //     }
+            //     root = target > root->val ? root->right : root->left;
+            // }
+            
+            // recursion below
+            if(root->right && target > root->val) {
+                int r = closestValue(root->right, target);
+                if(abs(res - target) > abs(r- target)) {
+                    res = r;
+                }
+            } else if(root->left && target < root->val) {
+                int l = closestValue(root->left, target);
+                if(abs(res - target) > abs(l- target)) {
+                    res = l;
+                }
             }
+            
+            return res;
         }
-        
-        return res;
-    }
-```
+    ```
 2. [Minimum Subtree](https://www.lintcode.com/problem/minimum-subtree/description?_from=ladder&&fromId=1)
-```c++
-    int minSum = INT_MAX;
-    TreeNode * minNode = nullptr;
-    
-    TreeNode * findSubtree(TreeNode * root) {
-        if(root == nullptr || !root->left && !root->right) {
-            return root;
+    ```c++
+        int minSum = INT_MAX;
+        TreeNode * minNode = nullptr;
+        
+        TreeNode * findSubtree(TreeNode * root) {
+            if(root == nullptr || !root->left && !root->right) {
+                return root;
+            }
+            findSub(root);
+            return minNode;
         }
-        findSub(root);
-        return minNode;
-    }
-    int findSub(TreeNode * root) {
-        if(root == nullptr) {
-            return 0;
+        int findSub(TreeNode * root) {
+            if(root == nullptr) {
+                return 0;
+            }
+            // post order traversal
+            // operation on minNode
+            int curSum = findSub(root->left) + root->val + findSub(root->right);
+            }
+            if(curSum < minSum) {
+                minSum = curSum;
+                minNode = root;
+            }
+            return curSum;
         }
-        // post order traversal
-        // operation on minNode
-        int curSum = findSub(root->left) + root->val + findSub(root->right);
+    ```
+3. [Binary Tree Path](https://www.lintcode.com/problem/binary-tree-paths/)
+    ```c++
+        /**
+         - @param root: the root of the binary tree
+         - @return: all root-to-leaf paths
+         */
+        vector<string> result;
+        vector<string> binaryTreePaths(TreeNode * root) {
+            // write your code here
+            if(root == nullptr) {
+                return {};
+            }
+            findPath(root, "");
+            return result;
         }
-        if(curSum < minSum) {
-            minSum = curSum;
-            minNode = root;
+        void findPath(TreeNode * root,string str) {
+            if(!root->left && !root->right) {
+                result.push_back(str + to_string(root->val));
+            } 
+            if(root->left){
+                findPath(root->left, str + to_string(root->val) +  "->");
+            }
+            if(root->right) {
+                findPath(root->right, str +  to_string(root->val) + "->");
+            }
         }
-        return curSum;
-    }
-```
-3. [Binary Tree Path](https://www.lintcode.com/problem/minimum-subtree/description?_from=ladder&&fromId=1)
-```c++
-    /**
-     * @param root: the root of the binary tree
-     * @return: all root-to-leaf paths
-     */
-    vector<string> result;
-    vector<string> binaryTreePaths(TreeNode * root) {
-        // write your code here
-        if(root == nullptr) {
-            return {};
-        }
-        findPath(root, "");
-        return result;
-    }
-    void findPath(TreeNode * root,string str) {
-        if(!root->left && !root->right) {
-            result.push_back(str + to_string(root->val));
-        } 
-        if(root->left){
-            findPath(root->left, str + to_string(root->val) +  "->");
-        }
-        if(root->right) {
-            findPath(root->right, str +  to_string(root->val) + "->");
-        }
-    }
-```
+    ```
 4. [Flatten Binary Tree to Linked List](https://www.lintcode.com/problem/flatten-binary-tree-to-linked-list/description?_from=ladder&&fromId=1)
-```c++
-    void flatten(TreeNode * root) {
-        if(root == nullptr || !root->left && !root->right) {
-            return;
+    ```c++
+        void flatten(TreeNode * root) {
+            if(root == nullptr || !root->left && !root->right) {
+                return;
+            }
+            flatten(root->left);
+            flatten(root->right);
+            TreeNode * right = root->right;
+            root->right = root->left;
+            root->left = nullptr;
+            TreeNode * tmp = root;
+            while(tmp->right) {
+                tmp = tmp->right;
+            }
+            tmp->right = right;
+            // any traversal order could work (in pre post)
         }
-        flatten(root->left);
-        flatten(root->right);
-        TreeNode * right = root->right;
-        root->right = root->left;
-        root->left = nullptr;
-        TreeNode * tmp = root;
-        while(tmp->right) {
-            tmp = tmp->right;
-        }
-        tmp->right = right;
-        // any traversal order could work (in pre post)
-    }
-```
+    ```
 5. [Binary Tree Preorder Traversal](https://www.lintcode.com/problem/binary-tree-preorder-traversal/description?_from=ladder&&fromId=1)
-```c++
-    vector<int> preorderTraversal(TreeNode * root) {
-        if(root == nullptr) {
-            return {};
-        }
-        vector<int> results;
-        preOrder(root, results);
-        return results;
-    }
-    
-    void preOrder(TreeNode * node, vector<int> & results) {
-        if(node == nullptr) {
-            return;
-        }
-        results.push_back(node->val);
-        preOrder(node->left, results);
-        preOrder(node->right, results);
-    }
-```
-6. [Max Depth of Binary Tree](https://www.lintcode.com/problem/maximum-depth-of-binary-tree/description?_from=ladder&&fromId=1)
-```c++
-    // divide & conquer
-    int maxDepth(TreeNode * root) {
-        if(root == nullptr) {
-            return 0;
-        }
-        return max(maxDepth(root->left), maxDepth(root->right)) + 1;
-    }
-    // traverse
-    int depth = 0;
-    int maxDepth(TreeNode * root) {
-        findMaxDepth(root, 0);
-        return depth;
-    }
-    void findMaxDepth(TreeNode * root, int curDepth) {
-        if(!root) {
-            depth = max(depth, curDepth);
-            return;
-        }
-        findMaxDepth(root->left, curDepth + 1);
-        findMaxDepth(root->right, curDepth + 1);
-    }
-
-```
-7. [Subtree with Maximum Average](https://www.lintcode.com/problem/subtree-with-maximum-average/description?_from=ladder&&fromId=1)
-```c++
-    TreeNode* maxAvgNode = nullptr;
-    double maxAvg = INT_MIN;
-    
-    TreeNode * findSubtree2(TreeNode * root) {
-        // recursion + post order
-        if(root == nullptr) {
-            return root;
-        }
-        findSubTree(root);
-        return maxAvgNode;
-    }
-    // return a double array first being the sum and second being the # of elements
-    vector<double> findSubTree(TreeNode * root) {
-        if(!root) {
-            return {0.0, 0.0};
-        }
-        vector<double> leftVals = findSubTree(root->left);
-        vector<double> rightVals = findSubTree(root->right);
-        double newNum = leftVals[1] + rightVals[1] + 1;
-        double newSum = (leftVals[0] + rightVals[0] + root->val);
-        double newAvg = newSum / newNum;
-        if(newAvg > maxAvg) {
-            maxAvgNode = root;
-            maxAvg = newAvg;
-        }
-        return {newSum, newNum};
-    }
-```
-8. [Balanced Binary Search Tree](https://www.lintcode.com/problem/balanced-binary-tree/description?_from=ladder&&fromId=1)
-```c++
-    /**
-     * @param root: The root of binary tree.
-     * @return: True if this Binary tree is Balanced, or false.
-     */
-    int NOT_BALANCED = -1;
-    bool isBalanced(TreeNode * root) {
-        return depthBalanced(root) != NOT_BALANCED;
-    }
-    
-    int depthBalanced(TreeNode * root) {
-        if(root == nullptr) {
-            return 0;
-        }
-        int left = depthBalanced(root->left);
-        int right = depthBalanced(root->right);
-        if(left == NOT_BALANCED || right == NOT_BALANCED) {
-            return NOT_BALANCED;
-        }
-        if(abs(left - right) > 1) {
-            return NOT_BALANCED;
-        }
-        return 1 + max(left, right);
-    }
-```
-9. [Lowest Common Ancestor of a Binary Tree](https://www.lintcode.com/problem/lowest-common-ancestor-of-a-binary-tree/description?_from=ladder&&fromId=1)
-```c++
-    TreeNode * lowestCommonAncestor(TreeNode * root, TreeNode * A, TreeNode * B) {
-        if(root == nullptr || root == A || root == B) {
-            return root;
-        }
-        TreeNode* leftNode = lowestCommonAncestor(root->left, A, B);
-        TreeNode* rightNode = lowestCommonAncestor(root->right, A, B);
-        if(leftNode && rightNode) {
-            return root;
-        }
-        if(leftNode) {
-            return leftNode;
-        }
-        if(rightNode) {
-            return rightNode;
-        }
-        return nullptr;
-    }
-```
-10. [Lowest Common Ancestor II](https://www.lintcode.com/problem/lowest-common-ancestor-ii/description?_from=ladder&&fromId=1)
-```c++
-    ParentTreeNode * lowestCommonAncestorII(ParentTreeNode * root, ParentTreeNode * A, ParentTreeNode * B) {
-        if(A == B) {
-            return A;
-        }
-        // get path
-        vector<ParentTreeNode*> pathA = getPath2Root(A);
-        vector<ParentTreeNode*> pathB = getPath2Root(B);
-        
-        // compare pathA and pathB
-        ParentTreeNode * lowestNode;
-        int i = pathA.size() - 1, j = pathB.size() - 1; 
-        while(i >= 0 && j >= 0) {
-            if(pathA[i] != pathB[j]) {
-                break;
+    ```c++
+        vector<int> preorderTraversal(TreeNode * root) {
+            if(root == nullptr) {
+                return {};
             }
-            lowestNode = pathA[i];
-            --i;
-            --j;
-        }
-        
-        return lowestNode;
-    }
-    
-    vector<ParentTreeNode*> getPath2Root(ParentTreeNode * node) {
-        vector<ParentTreeNode*> path;
-        while(node) {
-            path.push_back(node);
-            node = node->parent;
-        }
-        return path;
-    }
-```
-11. [Lowest Common Ancestor III](https://www.lintcode.com/problem/lowest-common-ancestor-iii/description?_from=ladder&&fromId=1)
-```c++
-class ResultType{
-public:
-    TreeNode * node;
-    bool aExist;
-    bool bExist;
-    ResultType(TreeNode* node, bool aExist, bool bExist): node(node), aExist(aExist), bExist(bExist){}
- };    
-class Solution {
-public:
-    TreeNode * lowestCommonAncestor3(TreeNode * root, TreeNode * A, TreeNode * B) {
-        ResultType result = helper(root, A, B);
-
-        if(!result.aExist || !result.bExist) {
-            return nullptr;
-        }
-        return result.node;
-    }
-    
-    ResultType helper(TreeNode * cur, TreeNode* A, TreeNode* B) {
-        if(!cur) {
-            return ResultType(nullptr, false, false);
-        }
-        ResultType left = helper(cur->left, A, B);
-        ResultType right  = helper(cur->right, A, B);
-        bool aExist = left.aExist || right.aExist || cur == A;
-        bool bExist = left.bExist || right.bExist || cur == B;
-        if(cur == A || cur == B) {
-            return ResultType(cur, aExist, bExist);
-        }
-        if(left.node && right.node) {
-            return ResultType(cur, aExist, bExist);
-        }
-        if(left.node) {
-            return ResultType(left.node, aExist, bExist);
-        }
-        if(right.node) {
-            return ResultType(right.node, aExist, bExist);
-        }
-        return ResultType(nullptr, aExist, bExist);
-    }
-}
-```
-12.[kth smallest element in a BST](https://www.lintcode.com/problem/kth-smallest-element-in-a-bst/?_from=ladder&&fromId=1)
-```c++
-    int kth = -1;
-    int index = 0;
-     // inorder traversal
-    int kthSmallest(TreeNode * root, int k) {
-        inorder(root, k);
-        return kth;
-    }
-    void inorder(TreeNode * root, int k) {
-        if(root == nullptr) {
-            return;
-        }
-        inorder(root->left, k);
-        
-        if(++index == k) {
-            kth = root->val;
-            return;
-        }
-        
-        inorder(root->right, k);
-    }
-```
-13.[Validate Binary Search Tree](https://www.lintcode.com/problem/validate-binary-search-tree/description?_from=ladder&&fromId=1)
-```c++
-    TreeNode * prevNode = nullptr;
-    
-    bool isValidBST(TreeNode * root) {
-        if(root == nullptr) {
-            return true;
-        }
-        if(!isValidBST(root->left)){
-            return false;
-        }
-        
-        if(prevNode != nullptr && prevNode->val >= root->val){
-            return false;
-        }
-        
-        prevNode = root;
-
-        if(!isValidBST(root->right)){
-            return false;
-        }
-        
-        return true;
-    }
-```
-14. [BST Iterator](https://www.lintcode.com/problem/binary-search-tree-iterator/description?_from=ladder&&fromId=1)
-```c++
-class BSTIterator {
-public:
-    stack<TreeNode *> mystack;
-    /*
-    * @param root: The root of binary tree.
-    */
-    BSTIterator(TreeNode * root) {
-        while(root) {
-            mystack.push(root);
-            root = root->left;
-        }
-    }
-
-    /*
-     * @return: True if there has next node, or false
-     */
-    bool hasNext() {
-        return !mystack.empty();
-    }
-
-    /*
-     * @return: return next node
-     */
-    TreeNode * next() {
-        if(mystack.empty()) {
-            return nullptr;
-        }
-        TreeNode * next = mystack.top(); mystack.pop();
-        TreeNode * right = next->right;
-        while(right) {
-            mystack.push(right);
-            right = right->left;
-        }
-        return next;
-    }
-};
-```
-15. [Closest Binary Search Tree Value II](https://www.lintcode.com/problem/closest-binary-search-tree-value-ii/description?_from=ladder&&fromId=1)
-```c++
-    vector<int> result;
-    int index = 0;
-    vector<int> closestKValues(TreeNode * root, double target, int k) {
-        helper(root, target, k);
-        return result;
-    }
-    
-    void helper(TreeNode * cur, double target, int k) {
-        if(cur == nullptr) {
-            return;
-        }
-        helper(cur->left, target, k);
-        if(result.size() == k) {
-            if(abs(cur->val - target) < abs(result[index] - target)) {
-                result[index++] = cur->val;
-                index = index % k;
-            }
-        } else {
-            result.push_back(cur->val);
-        }
-        helper(cur->right, target, k);
-    }
-```
-
-#### Two Pointer
-1. [Middle of Linked List](https://www.lintcode.com/problem/middle-of-linked-list/description?_from=ladder&&fromId=1)
-```c++
-    ListNode * middleNode(ListNode * head) {
-        if(!head || !head->next) {
-            return head;
-        }
-        ListNode * slow = head;
-        ListNode * fast = head->next;
-        while(fast && fast->next) {
-            slow = slow->next;
-            fast = fast->next->next;
-        }
-        return slow;
-    }
-```
-2. [Two Sum](https://www.lintcode.com/problem/two-sum/description?_from=ladder&&fromId=1)
-```c++
-     vector<int> twoSum(vector<int> &numbers, int target) {
-        // using hash map
-        std::unordered_map<int, int> hash;
-
-        for(int i = 0; i < numbers.size(); ++i) {
-            if(hash.find(target - numbers[i]) != hash.end()) {
-                return {hash[target - numbers[i]], i};
-            }
-            hash[numbers[i]] = i;
-        }
-        return  {};
-        // using pointers but return index after sorting 
-        int ptrLeft = 0, ptrRight = nums.size() - 1;
-        while(ptrLeft < ptrRight) {
-            if(nums[ptrLeft] + nums[ptrRight] == target) {
-                return {ptrLeft, ptrRight};
-            }
-            if(nums[ptrLeft] + nums[ptrRight] < target) {
-                ++ptrleft;
-            } else {
-                --ptrRight;
-            }
-        }
-        return {};
-    }
-```
-3. [Window Sum](https://www.lintcode.com/problem/window-sum/description?_from=ladder&&fromId=1)
-```c++
-    vector<int> winSum(vector<int> &nums, int k) {
-        vector<int> results;
-        if(k == 0 || k > nums.size() || nums.size() == 0) {
+            vector<int> results;
+            preOrder(root, results);
             return results;
         }
-        int firstSum = 0;
-        for(int i = 0; i < k; ++i) {
-            firstSum += nums[i];
-        }
-        results.push_back(firstSum);
-        for(int i = 0; i < nums.size() - k; ++i) {
-            firstSum = firstSum - nums[i] + nums[i + k];
-            results.push_back(firstSum);
-        }
-        return results;
-    }
-```
-4. [Two Sum III - Data structure design](https://www.lintcode.com/problem/two-sum-iii-data-structure-design/description?_from=ladder&&fromId=1)
-```c++
-class TwoSum {
-public:
-    unordered_multiset<int> nums;
-    // Add the number to an internal data structure.
-    void add(int number) {
-        nums.insert(number);
-    }
-
-    // Find if there exists any pair of numbers which sum is equal to the value.
-    bool find(int value) {
-        for (int i : nums) {
-            int count = i == value - i ? 2 : 1;
-            if (nums.count(value - i) >= count) {
-                return true;
-            }
-        }
-        return false;
-    }
-};
-```
-5. [Move Zeros](https://www.lintcode.com/problem/move-zeroes/description?_from=ladder&&fromId=1)
-```c++
-    void moveZeroes(vector<int> &nums) {
-        int nonZeroPtr = 0, arrPtr = 0;
-        while(arrPtr < nums.size()) {
-            if(nums[arrPtr] != 0) {
-                nums[nonZeroPtr++] = nums[arrPtr];
-            }
-            ++arrPtr;
-        }
-        while(nonZeroPtr < nums.size()) {
-            nums[nonZeroPtr++] = 0;
-        }
-    }
-```
-6. [Remove Duplicates Numbers in Array](https://www.lintcode.com/problem/remove-duplicate-numbers-in-array/description?_from=ladder&&fromId=1)
-```c++
-    int deduplication(vector<int> &nums) {
-        if(nums.size() == 0) {
-            return 0;
-        }
-        // using hash map
-        unordered_set<int> exist;
-        for(int value: nums) {
-            exist.insert(value);
-        }
-        int i = 0;
-        for(unordered_set<int>::iterator it = exist.begin(); it != exist.end();++it) {
-            nums[i++] = *it;
-        }
-        return i;
         
-        // two pointer
-        sort(nums.begin(), nums.end());
-        int arrPtr = 1, notDup = 0;
-        while(arrPtr < nums.size()) {
-            if(nums[arrPtr] != nums[notDup]) {
-                nums[++notDup] = nums[arrPtr];
+        void preOrder(TreeNode * node, vector<int> & results) {
+            if(node == nullptr) {
+                return;
             }
-            ++arrPtr;
+            results.push_back(node->val);
+            preOrder(node->left, results);
+            preOrder(node->right, results);
         }
-        return notDup + 1;
-    }
-```
+    ```
+6. [Max Depth of Binary Tree](https://www.lintcode.com/problem/maximum-depth-of-binary-tree/description?_from=ladder&&fromId=1)
+    ```c++
+        // divide & conquer
+        int maxDepth(TreeNode * root) {
+            if(root == nullptr) {
+                return 0;
+            }
+            return max(maxDepth(root->left), maxDepth(root->right)) + 1;
+        }
+        // traverse
+        int depth = 0;
+        int maxDepth(TreeNode * root) {
+            findMaxDepth(root, 0);
+            return depth;
+        }
+        void findMaxDepth(TreeNode * root, int curDepth) {
+            if(!root) {
+                depth = max(depth, curDepth);
+                return;
+            }
+            findMaxDepth(root->left, curDepth + 1);
+            findMaxDepth(root->right, curDepth + 1);
+        }
 
-7. [Sort Integer II](https://www.lintcode.com/problem/sort-integers-ii/description?_from=ladder&&fromId=1)
-```c++
-public:
-    void sortIntegers2(vector<int> &A) {
-        // quickSort & mergeSort
-        if(A.size() <= 1) {
-            return;
-        }
-        int temp[A.size()];
-        mergeSort(A, 0, A.size() - 1, temp);
-        quickSort(A, 0, A.size() - 1);        
-    }
-    
-private:
-    void mergeSort(vector<int> & nums, int start, int end, int temp []) {
-        if(start >= end) {
-            return;
-        }
-        int mid = start + (end - start) / 2; 
-        mergeSort(nums, start, mid, temp);
-        mergeSort(nums, mid + 1, end, temp);
-        merge(nums, start, mid, end, temp);
-    } 
-    void merge(vector<int> & nums, int start, int mid, int end, int temp[]) {
-        int leftIndex = start;
-        int rightIndex = mid + 1;
-        int tempIndex = start;
-        while(leftIndex <= mid && rightIndex <= end) {
-            if(nums[leftIndex] <= nums[rightIndex]) {
-                temp[tempIndex++] = nums[leftIndex++];
-            } else {
-                temp[tempIndex++] = nums[rightIndex++];
+    ```
+7. [Subtree with Maximum Average](https://www.lintcode.com/problem/subtree-with-maximum-average/description?_from=ladder&&fromId=1)
+    ```c++
+        TreeNode* maxAvgNode = nullptr;
+        double maxAvg = INT_MIN;
+        
+        TreeNode * findSubtree2(TreeNode * root) {
+            // recursion + post order
+            if(root == nullptr) {
+                return root;
             }
+            findSubTree(root);
+            return maxAvgNode;
         }
-        while(leftIndex <= mid) {
-            temp[tempIndex++] = nums[leftIndex++];
-        }
-        while(rightIndex <= end) {
-            temp[tempIndex++] = nums[rightIndex++];
-        }
-        for(int i = start; i <= end; ++i) {
-            nums[i] = temp[i];
-        }
-    }
-    
-    void quickSort(vector<int> & nums, int start, int end) {
-        if(start >= end) {
-            return;
-        }
-        int left = start, right = end, mid = (start + end) / 2; // mid as the pivot point, random index is also good
-        int pivot = nums[mid]; // pick the pivot point but not the index
-        // put <= here to make sure left right pass each other to avoid dead loop like in [1 2] would end in dead loop quickSort([1 2], 0, 1)
-        while(left <= right) { 
-            // put the element <= pivot on left and >= on right 
-            // not < or > because we want it evenly distributed, for instance if we have 1 1 1 1 1 2 then we want to divide it into 'half' but not 1 1 1 1 1 | 2 or 1 | 1 1 1 1 2 
-            while(left <= right && nums[left] < pivot) { // < 
-                ++left;
+        // return a double array first being the sum and second being the # of elements
+        vector<double> findSubTree(TreeNode * root) {
+            if(!root) {
+                return {0.0, 0.0};
             }
-            while(left <= right && nums[right] > pivot) {
-                --right;
+            vector<double> leftVals = findSubTree(root->left);
+            vector<double> rightVals = findSubTree(root->right);
+            double newNum = leftVals[1] + rightVals[1] + 1;
+            double newSum = (leftVals[0] + rightVals[0] + root->val);
+            double newAvg = newSum / newNum;
+            if(newAvg > maxAvg) {
+                maxAvgNode = root;
+                maxAvg = newAvg;
             }
-            if(left <= right) {
-                std::swap(nums[left++], nums[right--]);
-            }
+            return {newSum, newNum};
         }
-        quickSort(nums, start, right);
-        quickSort(nums, left, end);   
-    }
-```
-- difference between **quickSort** and **mergeSort**
-    - both use divide & conquer strategy
-        - whole to part vs. part to whole
-    - [why is quicksort better](https://stackoverflow.com/questions/70402/why-is-quicksort-better-than-mergesort)
-    - worst case O(n^2) v.s. O(nlgn)
-    - in-place  vs. auxilary space 
-    - quicksort: good cache locality
-    - mergesort: *stable* sort and can be easily adapted to operate on *linked lists*
-
-8. [Partition Array](https://www.lintcode.com/problem/partition-array/description?_from=ladder&&fromId=1) 
-```c++
-    int partitionArray(vector<int> &nums, int k) {
-        int start = 0, end = nums.size() - 1;
-        // pivot is k using quicksort
-        while(start <= end) {
-            while(start <= end && nums[start] < k) {
-                ++start;
-            }
-            while(start <= end && nums[end] >= k) {
-                --end;
-            }
-            if(start <= end) {
-                swap(nums[start++], nums[end--]);
-            }
+    ```
+8. [Balanced Binary Search Tree](https://www.lintcode.com/problem/balanced-binary-tree/description?_from=ladder&&fromId=1)
+    ```c++
+        /**
+         - @param root: The root of binary tree.
+         - @return: True if this Binary tree is Balanced, or false.
+         */
+        int NOT_BALANCED = -1;
+        bool isBalanced(TreeNode * root) {
+            return depthBalanced(root) != NOT_BALANCED;
         }
-        return start;
-    }
-```
-9. [Kth Largest Element](https://www.lintcode.com/problem/kth-largest-element/description?_from=ladder&&fromId=1)
-```c++
-    int kthLargestElement(int k, vector<int> &nums) {
-        if(nums.size() == 0) {
-            return -1;
-        }
-        return quickSelect(nums, 0, nums.size() - 1, k);
-    }
-    
-    int quickSelect(vector<int> & nums, int start, int end ,int k) {
-        if(start == end) {
-            return nums[start];
-        }
-        int left = start, right = end;
-        int pivot = nums[(start + end) / 2];
-        while(left <= right) {
-            while(left <= right && nums[left] > pivot) { // if < pivot then sort in ascending order and we can find kth smallest
-                ++left;
+        
+        int depthBalanced(TreeNode * root) {
+            if(root == nullptr) {
+                return 0;
             }
-            while(left <= right && nums[right] < pivot) {
-                --right;
+            int left = depthBalanced(root->left);
+            int right = depthBalanced(root->right);
+            if(left == NOT_BALANCED || right == NOT_BALANCED) {
+                return NOT_BALANCED;
             }
-            if(left <= right) {
-                std::swap(nums[left++], nums[right--]);
+            if(abs(left - right) > 1) {
+                return NOT_BALANCED;
             }
+            return 1 + max(left, right);
         }
-        if(start + k - 1 <= right) {
-            return quickSelect(nums, start, right, k);
-        }
-        if(start + k - 1 >= left) {
-            return quickSelect(nums, left, end, k - (left - start));
-        }
-        return nums[left - 1]; // same as nums[right + 1]
-    }
-```
-10. [Two Sum - Difference equals to target](https://www.lintcode.com/problem/two-sum-difference-equals-to-target/?_from=ladder&&fromId=1)
-```c++
-    vector<int> twoSum7(vector<int> nums, int target) {
-        // two pointer in the same direction
-        sort(nums.begin(), nums.end());
-        int first = 0, second = 0;
-        target= abs(target);
-        while(second < nums.size()) {
-            while(second<nums.size() && nums[second] - nums[first] < target) {
-                ++second;
+    ```
+9. [Lowest Common Ancestor of a Binary Tree](https://www.lintcode.com/problem/lowest-common-ancestor-of-a-binary-tree/description?_from=ladder&&fromId=1)
+    ```c++
+        TreeNode * lowestCommonAncestor(TreeNode * root, TreeNode * A, TreeNode * B) {
+            if(root == nullptr || root == A || root == B) {
+                return root;
             }
-            if(nums[second] - nums[first] == target) {
-                return {nums[first], nums[second]};
+            TreeNode* leftNode = lowestCommonAncestor(root->left, A, B);
+            TreeNode* rightNode = lowestCommonAncestor(root->right, A, B);
+            if(leftNode && rightNode) {
+                return root;
             }
-            ++first;
-        }
-        return {};
-
-        // using hash map
-        std::unordered_map<int, int> hash;
-        // target = abs(target);
-        for(int i = 0; i < nums.size(); ++i) {
-            if(hash.find(target + nums[i]) != hash.end()) {
-                return {hash[target + nums[i]] + 1, i + 1};
+            if(leftNode) {
+                return leftNode;
             }
-            if(hash.find(nums[i] - target) != hash.end()) {
-                return {hash[nums[i] - target] + 1, i + 1};
+            if(rightNode) {
+                return rightNode;
             }
-            hash[nums[i]] = i;
-        }
-    }
-```
-11. [3Sum](https://www.lintcode.com/problem/3sum/description?_from=ladder&&fromId=1)
-```c++
-    vector<vector<int>> threeSum(vector<int> &nums) {
-        vector<vector<int>> result;
-        sort(nums.begin(), nums.end());
-        int target = 0;
-        for(int i = 0; i < nums.size(); ++i) {
-            if(i > 0 && nums[i] == nums[i - 1]){
-                continue;
-            }
-            int start = i + 1, end = nums.size() - 1;
-            int targetTwo = target - nums[i];
-            // two sum
-            while(start < end) {
-                if(start > i + 1 && nums[start] == nums[start - 1]) {
-                    ++start;
-                    continue;
-                }
-                if(nums[start] + nums[end] == targetTwo) {
-                    result.push_back({nums[i], nums[start++], nums[end]}); // end-- doesn't work bc duplicate exists at the end
-                }else if(nums[start] + nums[end] < targetTwo) {
-                    ++start;
-                } else {
-                    --end;
-                }
-            }
-        }
-        return result;
-    }
-```
-12. [Sort Colors](https://www.lintcode.com/problem/sort-colors/description?_from=ladder&&fromId=1)
-```c++
-    void sortColors(vector<int> &a) {
-        // three pointers
-        if(a.size() <= 1) {
-            return;
-        }
-        int leftPtr = 0, rightPtr = a.size() - 1;
-        int index = 0;
-        while(index <= rightPtr) {
-            if(a[index] == 0) {
-                std::swap(a[index++], a[leftPtr++]);
-            } else if(a[index] == 1) {
-                ++index;
-            } else {
-                std::swap(a[index], a[rightPtr--]);
-            }
-        }
-    }
-```
-13. [Sort Colors II](https://www.lintcode.com/problem/sort-colors-ii/description?_from=ladder&&fromId=1)
-14. [Intersection of Two Linked Lists](https://www.lintcode.com/problem/intersection-of-two-linked-lists/description?_from=ladder&&fromId=1)
-```c++
-    ListNode * getIntersectionNode(ListNode * headA, ListNode * headB) {
-        if(headA == nullptr || headB == nullptr) {
             return nullptr;
         }
-        ListNode * linked = headA;
-        while(linked -> next != nullptr) {
-            linked = linked -> next;   
+    ```
+10. [Lowest Common Ancestor II](https://www.lintcode.com/problem/lowest-common-ancestor-ii/description?_from=ladder&&fromId=1)
+    ```c++
+        ParentTreeNode * lowestCommonAncestorII(ParentTreeNode * root, ParentTreeNode * A, ParentTreeNode * B) {
+            if(A == B) {
+                return A;
+            }
+            // get path
+            vector<ParentTreeNode*> pathA = getPath2Root(A);
+            vector<ParentTreeNode*> pathB = getPath2Root(B);
+            
+            // compare pathA and pathB
+            ParentTreeNode * lowestNode;
+            int i = pathA.size() - 1, j = pathB.size() - 1; 
+            while(i >= 0 && j >= 0) {
+                if(pathA[i] != pathB[j]) {
+                    break;
+                }
+                lowestNode = pathA[i];
+                --i;
+                --j;
+            }
+            
+            return lowestNode;
         }
-        linked -> next = headB;
-        ListNode * slow = headA;
-        ListNode * fast = headA -> next;
-        while(slow != fast) {
-            if(fast == nullptr || fast -> next == nullptr) {
+        
+        vector<ParentTreeNode*> getPath2Root(ParentTreeNode * node) {
+            vector<ParentTreeNode*> path;
+            while(node) {
+                path.push_back(node);
+                node = node->parent;
+            }
+            return path;
+        }
+    ```
+11. [Lowest Common Ancestor III](https://www.lintcode.com/problem/lowest-common-ancestor-iii/description?_from=ladder&&fromId=1)
+    ```c++
+    class ResultType{
+    public:
+        TreeNode * node;
+        bool aExist;
+        bool bExist;
+        ResultType(TreeNode* node, bool aExist, bool bExist): node(node), aExist(aExist), bExist(bExist){}
+     };    
+    class Solution {
+    public:
+        TreeNode * lowestCommonAncestor3(TreeNode * root, TreeNode * A, TreeNode * B) {
+            ResultType result = helper(root, A, B);
+
+            if(!result.aExist || !result.bExist) {
                 return nullptr;
             }
-            slow = slow -> next;
-            fast = fast -> next -> next;
+            return result.node;
         }
-        while(headA != slow -> next) {
-            headA = headA -> next;
-            slow = slow -> next;
+        
+        ResultType helper(TreeNode * cur, TreeNode* A, TreeNode* B) {
+            if(!cur) {
+                return ResultType(nullptr, false, false);
+            }
+            ResultType left = helper(cur->left, A, B);
+            ResultType right  = helper(cur->right, A, B);
+            bool aExist = left.aExist || right.aExist || cur == A;
+            bool bExist = left.bExist || right.bExist || cur == B;
+            if(cur == A || cur == B) {
+                return ResultType(cur, aExist, bExist);
+            }
+            if(left.node && right.node) {
+                return ResultType(cur, aExist, bExist);
+            }
+            if(left.node) {
+                return ResultType(left.node, aExist, bExist);
+            }
+            if(right.node) {
+                return ResultType(right.node, aExist, bExist);
+            }
+            return ResultType(nullptr, aExist, bExist);
         }
-        return headA;
     }
-```
-15. [Linked List Cycle](https://www.lintcode.com/problem/linked-list-cycle/description?_from=ladder&&fromId=1)
-```c++
-    bool hasCycle(ListNode * head) {
-        if(head == nullptr || head->next == nullptr) {
+    ```
+12.[kth smallest element in a BST](https://www.lintcode.com/problem/kth-smallest-element-in-a-bst/?_from=ladder&&fromId=1)
+    ```c++
+        int kth = -1;
+        int index = 0;
+         // inorder traversal
+        int kthSmallest(TreeNode * root, int k) {
+            inorder(root, k);
+            return kth;
+        }
+        void inorder(TreeNode * root, int k) {
+            if(root == nullptr) {
+                return;
+            }
+            inorder(root->left, k);
+            
+            if(++index == k) {
+                kth = root->val;
+                return;
+            }
+            
+            inorder(root->right, k);
+        }
+    ```
+13.[Validate Binary Search Tree](https://www.lintcode.com/problem/validate-binary-search-tree/description?_from=ladder&&fromId=1)
+    ```c++
+        TreeNode * prevNode = nullptr;
+        
+        bool isValidBST(TreeNode * root) {
+            if(root == nullptr) {
+                return true;
+            }
+            if(!isValidBST(root->left)){
+                return false;
+            }
+            
+            if(prevNode != nullptr && prevNode->val >= root->val){
+                return false;
+            }
+            
+            prevNode = root;
+
+            if(!isValidBST(root->right)){
+                return false;
+            }
+            
+            return true;
+        }
+    ```
+14. [BST Iterator](https://www.lintcode.com/problem/binary-search-tree-iterator/description?_from=ladder&&fromId=1)
+    ```c++
+    class BSTIterator {
+    public:
+        stack<TreeNode *> mystack;
+        /*
+        - @param root: The root of binary tree.
+        */
+        BSTIterator(TreeNode * root) {
+            while(root) {
+                mystack.push(root);
+                root = root->left;
+            }
+        }
+
+        /*
+         - @return: True if there has next node, or false
+         */
+        bool hasNext() {
+            return !mystack.empty();
+        }
+
+        /*
+         - @return: return next node
+         */
+        TreeNode * next() {
+            if(mystack.empty()) {
+                return nullptr;
+            }
+            TreeNode * next = mystack.top(); mystack.pop();
+            TreeNode * right = next->right;
+            while(right) {
+                mystack.push(right);
+                right = right->left;
+            }
+            return next;
+        }
+    };
+    ```
+15. [Closest Binary Search Tree Value II](https://www.lintcode.com/problem/closest-binary-search-tree-value-ii/description?_from=ladder&&fromId=1)
+    ```c++
+        vector<int> result;
+        int index = 0;
+        vector<int> closestKValues(TreeNode * root, double target, int k) {
+            helper(root, target, k);
+            return result;
+        }
+        
+        void helper(TreeNode * cur, double target, int k) {
+            if(cur == nullptr) {
+                return;
+            }
+            helper(cur->left, target, k);
+            if(result.size() == k) {
+                if(abs(cur->val - target) < abs(result[index] - target)) {
+                    result[index++] = cur->val;
+                    index = index % k;
+                }
+            } else {
+                result.push_back(cur->val);
+            }
+            helper(cur->right, target, k);
+        }
+    ```
+
+### Two Pointer
+1. [Middle of Linked List](https://www.lintcode.com/problem/middle-of-linked-list/description?_from=ladder&&fromId=1)
+    ```c++
+        ListNode * middleNode(ListNode * head) {
+            if(!head || !head->next) {
+                return head;
+            }
+            ListNode * slow = head;
+            ListNode * fast = head->next;
+            while(fast && fast->next) {
+                slow = slow->next;
+                fast = fast->next->next;
+            }
+            return slow;
+        }
+    ```
+2. [Two Sum](https://www.lintcode.com/problem/two-sum/description?_from=ladder&&fromId=1)
+    ```c++
+         vector<int> twoSum(vector<int> &numbers, int target) {
+            // using hash map
+            std::unordered_map<int, int> hash;
+
+            for(int i = 0; i < numbers.size(); ++i) {
+                if(hash.find(target - numbers[i]) != hash.end()) {
+                    return {hash[target - numbers[i]], i};
+                }
+                hash[numbers[i]] = i;
+            }
+            return  {};
+            // using pointers but return index after sorting 
+            int ptrLeft = 0, ptrRight = nums.size() - 1;
+            while(ptrLeft < ptrRight) {
+                if(nums[ptrLeft] + nums[ptrRight] == target) {
+                    return {ptrLeft, ptrRight};
+                }
+                if(nums[ptrLeft] + nums[ptrRight] < target) {
+                    ++ptrleft;
+                } else {
+                    --ptrRight;
+                }
+            }
+            return {};
+        }
+    ```
+3. [Window Sum](https://www.lintcode.com/problem/window-sum/description?_from=ladder&&fromId=1)
+    ```c++
+        vector<int> winSum(vector<int> &nums, int k) {
+            vector<int> results;
+            if(k == 0 || k > nums.size() || nums.size() == 0) {
+                return results;
+            }
+            int firstSum = 0;
+            for(int i = 0; i < k; ++i) {
+                firstSum += nums[i];
+            }
+            results.push_back(firstSum);
+            for(int i = 0; i < nums.size() - k; ++i) {
+                firstSum = firstSum - nums[i] + nums[i + k];
+                results.push_back(firstSum);
+            }
+            return results;
+        }
+    ```
+4. [Two Sum III - Data structure design](https://www.lintcode.com/problem/two-sum-iii-data-structure-design/description?_from=ladder&&fromId=1)
+    ```c++
+    class TwoSum {
+    public:
+        unordered_multiset<int> nums;
+        // Add the number to an internal data structure.
+        void add(int number) {
+            nums.insert(number);
+        }
+
+        // Find if there exists any pair of numbers which sum is equal to the value.
+        bool find(int value) {
+            for (int i : nums) {
+                int count = i == value - i ? 2 : 1;
+                if (nums.count(value - i) >= count) {
+                    return true;
+                }
+            }
             return false;
         }
-        ListNode* slow = head;
-        ListNode* fast = head->next;
-        while(fast != nullptr && fast ->next != nullptr) {
-            slow = slow -> next;
-            fast = fast -> next ->next;
-            if(slow == fast) {
-                return true;
+    };
+    ```
+5. [Move Zeros](https://www.lintcode.com/problem/move-zeroes/description?_from=ladder&&fromId=1)
+    ```c++
+        void moveZeroes(vector<int> &nums) {
+            int nonZeroPtr = 0, arrPtr = 0;
+            while(arrPtr < nums.size()) {
+                if(nums[arrPtr] != 0) {
+                    nums[nonZeroPtr++] = nums[arrPtr];
+                }
+                ++arrPtr;
+            }
+            while(nonZeroPtr < nums.size()) {
+                nums[nonZeroPtr++] = 0;
             }
         }
-        return false;
-    }
-```
-16. [Linked List Cycle II](https://www.lintcode.com/problem/linked-list-cycle-ii/description?_from=ladder&&fromId=1)
-```c++
-    ListNode * detectCycle(ListNode * head) {
-        if(head == nullptr || head -> next == nullptr) {
-            return nullptr;
+    ```
+6. [Remove Duplicates Numbers in Array](https://www.lintcode.com/problem/remove-duplicate-numbers-in-array/description?_from=ladder&&fromId=1)
+    ```c++
+        int deduplication(vector<int> &nums) {
+            if(nums.size() == 0) {
+                return 0;
+            }
+            // using hash map
+            unordered_set<int> exist;
+            for(int value: nums) {
+                exist.insert(value);
+            }
+            int i = 0;
+            for(unordered_set<int>::iterator it = exist.begin(); it != exist.end();++it) {
+                nums[i++] = *it;
+            }
+            return i;
+            
+            // two pointer
+            sort(nums.begin(), nums.end());
+            int arrPtr = 1, notDup = 0;
+            while(arrPtr < nums.size()) {
+                if(nums[arrPtr] != nums[notDup]) {
+                    nums[++notDup] = nums[arrPtr];
+                }
+                ++arrPtr;
+            }
+            return notDup + 1;
         }
-        ListNode * slow = head;
-        ListNode * fast = head -> next;
-        while(slow != fast) {
-            if(fast == nullptr || fast -> next == nullptr) {
+    ```
+7. [Sort Integer II](https://www.lintcode.com/problem/sort-integers-ii/description?_from=ladder&&fromId=1)
+    ```c++
+    public:
+        void sortIntegers2(vector<int> &A) {
+            // quickSort & mergeSort
+            if(A.size() <= 1) {
+                return;
+            }
+            int temp[A.size()];
+            mergeSort(A, 0, A.size() - 1, temp);
+            quickSort(A, 0, A.size() - 1);        
+        }
+        
+    private:
+        void mergeSort(vector<int> & nums, int start, int end, int temp []) {
+            if(start >= end) {
+                return;
+            }
+            int mid = start + (end - start) / 2; 
+            mergeSort(nums, start, mid, temp);
+            mergeSort(nums, mid + 1, end, temp);
+            merge(nums, start, mid, end, temp);
+        } 
+        void merge(vector<int> & nums, int start, int mid, int end, int temp[]) {
+            int leftIndex = start;
+            int rightIndex = mid + 1;
+            int tempIndex = start;
+            while(leftIndex <= mid && rightIndex <= end) {
+                if(nums[leftIndex] <= nums[rightIndex]) {
+                    temp[tempIndex++] = nums[leftIndex++];
+                } else {
+                    temp[tempIndex++] = nums[rightIndex++];
+                }
+            }
+            while(leftIndex <= mid) {
+                temp[tempIndex++] = nums[leftIndex++];
+            }
+            while(rightIndex <= end) {
+                temp[tempIndex++] = nums[rightIndex++];
+            }
+            for(int i = start; i <= end; ++i) {
+                nums[i] = temp[i];
+            }
+        }
+        
+        void quickSort(vector<int> & nums, int start, int end) {
+            if(start >= end) {
+                return;
+            }
+            int left = start, right = end, mid = (start + end) / 2; // mid as the pivot point, random index is also good
+            int pivot = nums[mid]; // pick the pivot point but not the index
+            // put <= here to make sure left right pass each other to avoid dead loop like in [1 2] would end in dead loop quickSort([1 2], 0, 1)
+            while(left <= right) { 
+                // put the element <= pivot on left and >= on right 
+                // not < or > because we want it evenly distributed, for instance if we have 1 1 1 1 1 2 then we want to divide it into 'half' but not 1 1 1 1 1 | 2 or 1 | 1 1 1 1 2 
+                while(left <= right && nums[left] < pivot) { // < 
+                    ++left;
+                }
+                while(left <= right && nums[right] > pivot) {
+                    --right;
+                }
+                if(left <= right) {
+                    std::swap(nums[left++], nums[right--]);
+                }
+            }
+            quickSort(nums, start, right);
+            quickSort(nums, left, end);   
+        }
+    ```
+    + difference between **quickSort** and **mergeSort**
+        + both use divide & conquer strategy
+            + whole to part vs. part to whole
+        + [why is quicksort better](https://stackoverflow.com/questions/70402/why-is-quicksort-better-than-mergesort)
+        + worst case O(n^2) v.s. O(nlgn)
+        + in-place  vs. auxilary space 
+        + quicksort: good cache locality
+        + mergesort: *stable* sort and can be easily adapted to operate on *linked lists*
+8. [Partition Array](https://www.lintcode.com/problem/partition-array/description?_from=ladder&&fromId=1) 
+    ```c++
+        int partitionArray(vector<int> &nums, int k) {
+            int start = 0, end = nums.size() - 1;
+            // pivot is k using quicksort
+            while(start <= end) {
+                while(start <= end && nums[start] < k) {
+                    ++start;
+                }
+                while(start <= end && nums[end] >= k) {
+                    --end;
+                }
+                if(start <= end) {
+                    swap(nums[start++], nums[end--]);
+                }
+            }
+            return start;
+        }
+    ```
+9. [Kth Largest Element](https://www.lintcode.com/problem/kth-largest-element/description?_from=ladder&&fromId=1)
+    ```c++
+        int kthLargestElement(int k, vector<int> &nums) {
+            if(nums.size() == 0) {
+                return -1;
+            }
+            return quickSelect(nums, 0, nums.size() - 1, k);
+        }
+        
+        int quickSelect(vector<int> & nums, int start, int end ,int k) {
+            if(start == end) {
+                return nums[start];
+            }
+            int left = start, right = end;
+            int pivot = nums[(start + end) / 2];
+            while(left <= right) {
+                while(left <= right && nums[left] > pivot) { // if < pivot then sort in ascending order and we can find kth smallest
+                    ++left;
+                }
+                while(left <= right && nums[right] < pivot) {
+                    --right;
+                }
+                if(left <= right) {
+                    std::swap(nums[left++], nums[right--]);
+                }
+            }
+            if(start + k - 1 <= right) {
+                return quickSelect(nums, start, right, k);
+            }
+            if(start + k - 1 >= left) {
+                return quickSelect(nums, left, end, k - (left - start));
+            }
+            return nums[left - 1]; // same as nums[right + 1]
+        }
+    ```
+10. [Two Sum - Difference equals to target](https://www.lintcode.com/problem/two-sum-difference-equals-to-target/?_from=ladder&&fromId=1)
+    ```c++
+        vector<int> twoSum7(vector<int> nums, int target) {
+            // two pointer in the same direction
+            sort(nums.begin(), nums.end());
+            int first = 0, second = 0;
+            target= abs(target);
+            while(second < nums.size()) {
+                while(second<nums.size() && nums[second] - nums[first] < target) {
+                    ++second;
+                }
+                if(nums[second] - nums[first] == target) {
+                    return {nums[first], nums[second]};
+                }
+                ++first;
+            }
+            return {};
+
+            // using hash map
+            std::unordered_map<int, int> hash;
+            // target = abs(target);
+            for(int i = 0; i < nums.size(); ++i) {
+                if(hash.find(target + nums[i]) != hash.end()) {
+                    return {hash[target + nums[i]] + 1, i + 1};
+                }
+                if(hash.find(nums[i] - target) != hash.end()) {
+                    return {hash[nums[i] - target] + 1, i + 1};
+                }
+                hash[nums[i]] = i;
+            }
+        }
+    ```
+11. [3Sum](https://www.lintcode.com/problem/3sum/description?_from=ladder&&fromId=1)
+    ```c++
+        vector<vector<int>> threeSum(vector<int> &nums) {
+            vector<vector<int>> result;
+            sort(nums.begin(), nums.end());
+            int target = 0;
+            for(int i = 0; i < nums.size(); ++i) {
+                if(i > 0 && nums[i] == nums[i - 1]){
+                    continue;
+                }
+                int start = i + 1, end = nums.size() - 1;
+                int targetTwo = target - nums[i];
+                // two sum
+                while(start < end) {
+                    if(start > i + 1 && nums[start] == nums[start - 1]) {
+                        ++start;
+                        continue;
+                    }
+                    if(nums[start] + nums[end] == targetTwo) {
+                        result.push_back({nums[i], nums[start++], nums[end]}); // end-- doesn't work bc duplicate exists at the end
+                    }else if(nums[start] + nums[end] < targetTwo) {
+                        ++start;
+                    } else {
+                        --end;
+                    }
+                }
+            }
+            return result;
+        }
+    ```
+12. [Sort Colors](https://www.lintcode.com/problem/sort-colors/description?_from=ladder&&fromId=1)
+    ```c++
+        void sortColors(vector<int> &a) {
+            // three pointers
+            if(a.size() <= 1) {
+                return;
+            }
+            int leftPtr = 0, rightPtr = a.size() - 1;
+            int index = 0;
+            while(index <= rightPtr) {
+                if(a[index] == 0) {
+                    std::swap(a[index++], a[leftPtr++]);
+                } else if(a[index] == 1) {
+                    ++index;
+                } else {
+                    std::swap(a[index], a[rightPtr--]);
+                }
+            }
+        }
+    ```
+13. [Sort Colors II](https://www.lintcode.com/problem/sort-colors-ii/description?_from=ladder&&fromId=1)
+14. [Intersection of Two Linked Lists](https://www.lintcode.com/problem/intersection-of-two-linked-lists/description?_from=ladder&&fromId=1)
+    ```c++
+        ListNode * getIntersectionNode(ListNode * headA, ListNode * headB) {
+            if(headA == nullptr || headB == nullptr) {
                 return nullptr;
             }
-            slow = slow -> next;
-            fast = fast -> next -> next;
+            ListNode * linked = headA;
+            while(linked -> next != nullptr) {
+                linked = linked -> next;   
+            }
+            linked -> next = headB;
+            ListNode * slow = headA;
+            ListNode * fast = headA -> next;
+            while(slow != fast) {
+                if(fast == nullptr || fast -> next == nullptr) {
+                    return nullptr;
+                }
+                slow = slow -> next;
+                fast = fast -> next -> next;
+            }
+            while(headA != slow -> next) {
+                headA = headA -> next;
+                slow = slow -> next;
+            }
+            return headA;
         }
-        // find cycle
-        slow = head;
-        while(slow != fast -> next) {
-            slow = slow -> next;
-            fast = fast -> next;
+    ```
+15. [Linked List Cycle](https://www.lintcode.com/problem/linked-list-cycle/description?_from=ladder&&fromId=1)
+    ```c++
+        bool hasCycle(ListNode * head) {
+            if(head == nullptr || head->next == nullptr) {
+                return false;
+            }
+            ListNode* slow = head;
+            ListNode* fast = head->next;
+            while(fast != nullptr && fast ->next != nullptr) {
+                slow = slow -> next;
+                fast = fast -> next ->next;
+                if(slow == fast) {
+                    return true;
+                }
+            }
+            return false;
         }
-        return slow;
-    }
-```
+    ```
+16. [Linked List Cycle II](https://www.lintcode.com/problem/linked-list-cycle-ii/description?_from=ladder&&fromId=1)
+    ```c++
+        ListNode * detectCycle(ListNode * head) {
+            if(head == nullptr || head -> next == nullptr) {
+                return nullptr;
+            }
+            ListNode * slow = head;
+            ListNode * fast = head -> next;
+            while(slow != fast) {
+                if(fast == nullptr || fast -> next == nullptr) {
+                    return nullptr;
+                }
+                slow = slow -> next;
+                fast = fast -> next -> next;
+            }
+            // find cycle
+            slow = head;
+            while(slow != fast -> next) {
+                slow = slow -> next;
+                fast = fast -> next;
+            }
+            return slow;
+        }
+    ```
 
-#### Implicit Graph DFS
+---
+
+### Implicit Graph DFS
 1. [Subsets](https://www.lintcode.com/problem/subsets/description?_from=ladder&&fromId=1)
 ```c++
     // combination -> tree problem
@@ -2138,7 +2139,7 @@ private:
 ```c++
     vector<vector<string>> solveNQueens(int n) {
         vector<vector<bool>> board(n, vector<bool>(n, false));
-        // initailze important here
+        // initialize important here
         vector<vector<string>> result;
         dfs(n, board, 0, result); // 0 indicates cur_col
         return result;
@@ -2340,7 +2341,7 @@ private:
 };
 ```
 
-#### Hash & Heap
+### Hash & Heap
 1. [Implement Stack by Two Queues](https://www.lintcode.com/problem/implement-stack-by-two-queues/description?_from=ladder&&fromId=1)
 ```c++
 // method 1: use push
@@ -2641,7 +2642,7 @@ public:
     }
 };
 ```
-priority queue in c++ is max heap by default
+    - priority queue in c++ is **max heap** by default
 9. [Insert Delete GetRandom O(1)](https://www.lintcode.com/problem/insert-delete-getrandom-o1/description?_from=ladder&&fromId=1)
 ```c++
 class RandomizedSet {
@@ -2805,86 +2806,86 @@ public:
 ```
 13. [Merge K Sorted Lists](https://www.lintcode.com/problem/merge-k-sorted-lists/description?_from=ladder&&fromId=1)
 ```c++
-//  struct compare{
-//      bool operator() (const ListNode * A, const ListNode * B) const {
-//          return A->val > B->val;
-//      }
-//  };
-// class Solution {
-// public:
-//     /**
-//      * @param lists: a list of ListNode
-//      * @return: The head of one sorted list.
-//      */
-//     ListNode *mergeKLists(vector<ListNode *> &lists) {
-//         if(lists.empty()) {
-//             return nullptr;
-//         }
-//         priority_queue<ListNode *, vector<ListNode *>, compare> min_heap;
-//         for(int i = 0; i < lists.size(); ++i) {
-//             if(lists[i] == nullptr) {
-//                 continue;
-//             }
-//             min_heap.push(lists[i]);
-//         }
-//         ListNode* dummy = new ListNode(0);
-//         ListNode * curNode = dummy;
-//         while(!min_heap.empty()) {
-//             curNode->next = min_heap.top();
-//             curNode = curNode->next;
-//             min_heap.pop();
-//             // add node
-//             if(curNode->next) {
-//                 min_heap.push(curNode->next);
-//             }
-//         }
-//         return dummy->next;
-//     }
-// };
+ struct compare{
+     bool operator() (const ListNode * A, const ListNode * B) const {
+         return A->val > B->val;
+     }
+ };
+class Solution {
+public:
+    /**
+     * @param lists: a list of ListNode
+     * @return: The head of one sorted list.
+     */
+    ListNode *mergeKLists(vector<ListNode *> &lists) {
+        if(lists.empty()) {
+            return nullptr;
+        }
+        priority_queue<ListNode *, vector<ListNode *>, compare> min_heap;
+        for(int i = 0; i < lists.size(); ++i) {
+            if(lists[i] == nullptr) {
+                continue;
+            }
+            min_heap.push(lists[i]);
+        }
+        ListNode* dummy = new ListNode(0);
+        ListNode * curNode = dummy;
+        while(!min_heap.empty()) {
+            curNode->next = min_heap.top();
+            curNode = curNode->next;
+            min_heap.pop();
+            // add node
+            if(curNode->next) {
+                min_heap.push(curNode->next);
+            }
+        }
+        return dummy->next;
+    }
+};
 
-// class Solution{
-// public:
-//     ListNode *mergeKLists(vector<ListNode *> &lists) {
-//         if(lists.size() == 1) {
-//             return lists[0];
-//         }
-//         vector<ListNode *> sublists;
-//         for(int i = 0; i < lists.size(); i+=2) {
-//             if(i == lists.size() - 1) {
-//                 sublists.push_back(lists[i]);
-//             } else {
-//                 sublists.push_back(merge(lists[i], lists[i + 1]));
-//             }
-//         }
-//         return mergeKLists(sublists);
-//     }
+class Solution{
+public:
+    ListNode *mergeKLists(vector<ListNode *> &lists) {
+        if(lists.size() == 1) {
+            return lists[0];
+        }
+        vector<ListNode *> sublists;
+        for(int i = 0; i < lists.size(); i+=2) {
+            if(i == lists.size() - 1) {
+                sublists.push_back(lists[i]);
+            } else {
+                sublists.push_back(merge(lists[i], lists[i + 1]));
+            }
+        }
+        return mergeKLists(sublists);
+    }
     
-//     ListNode * merge(ListNode * left, ListNode* right) {
-//         ListNode * dummy = new ListNode(0);
-//         ListNode * cur = dummy;
-//         while(left != nullptr && right != nullptr) {
-//             if(left->val < right->val) {
-//                 cur->next = left;
-//                 left = left->next;
-//             } else {
-//                 cur->next = right;
-//                 right = right->next;
-//             }
-//             cur = cur->next;
-//         }
-//         while(left != nullptr) {
-//             cur->next = left;
-//             left = left->next;
-//             cur = cur->next; // remember to also traverse thru cur
-//         }
-//         while(right != nullptr) {
-//             cur->next = right;
-//             right = right->next;
-//             cur = cur->next;
-//         }
-//         return dummy->next;
-//     }
-// };
+    ListNode * merge(ListNode * left, ListNode* right) {
+        ListNode * dummy = new ListNode(0);
+        ListNode * cur = dummy;
+        while(left != nullptr && right != nullptr) {
+            if(left->val < right->val) {
+                cur->next = left;
+                left = left->next;
+            } else {
+                cur->next = right;
+                right = right->next;
+            }
+            cur = cur->next;
+        }
+        while(left != nullptr) {
+            cur->next = left;
+            left = left->next;
+            cur = cur->next; // remember to also traverse thru cur
+        }
+        while(right != nullptr) {
+            cur->next = right;
+            right = right->next;
+            cur = cur->next;
+        }
+        return dummy->next;
+    }
+};
 
 
 class Solution{
@@ -3105,7 +3106,7 @@ public:
 };
 ```
 
-#### [Memorization Search & Dynamic Programming]
+### Memorization Search & Dynamic Programming
 1. [Word Break III](https://www.lintcode.com/problem/word-break/description?_from=ladder&&fromId=1)
 ```c++
     // 设dp[i][j]表示从字典dict中组成子串str[i:j+1]有多少种方法。
@@ -3271,7 +3272,7 @@ public:
     }
 ```
 
-#### DP
+### DP
 1. [Unique Path II](https://www.lintcode.com/problem/unique-paths-ii/description?_from=ladder&&fromId=1)
 ```c++
     int uniquePathsWithObstacles(vector<vector<int>> &obstacleGrid) {
@@ -3485,7 +3486,7 @@ i        // father here represents the preceding position
     }
 ```
 
-#### Additional Problems
+### Additional Problems
 1. [Intersection of Two Arrays](https://www.lintcode.com/problem/intersection-of-two-arrays/description?_from=ladder&&fromId=1)
 ```c++
     vector<int> intersection(vector<int> &nums1, vector<int> &nums2) {
@@ -3742,14 +3743,13 @@ public:
     }
 ```
 11. [Median of Two Sorted Arrays](https://www.lintcode.com/problem/median-of-two-sorted-arrays/description?_from=ladder&&fromId=1)
-could just use merge and count O(m + n)
-some advanced algorithm O(log(m + n)) 
-https://www.geeksforgeeks.org/median-two-sorted-arrays-different-sizes-ologminn-m/
-https://blog.csdn.net/yutianzuijin/article/details/11499917
+- could just use merge and count O(m + n)
+- [some advanced algorithm O(log(m + n))](https://www.geeksforgeeks.org/median-two-sorted-arrays-different-sizes-ologminn-m/
+https://blog.csdn.net/yutianzuijin/article/details/11499917)
 
 
 
-#### Others
+### Others
 [sell stock k times max profit](https://www.geeksforgeeks.org/maximum-profit-by-buying-and-selling-a-share-at-most-k-times/)
 ```c++
 // Function to find out maximum profit by buying 
@@ -4194,7 +4194,7 @@ private:
         return true;
     }
 ```
-[](https://leetcode.com/problems/range-sum-query-2d-immutable/discuss/75350/Clean-C%2B%2B-Solution-and-Explaination-O(mn)-space-with-O(1)-time)
+[Range Sum Query 2D - Immutable](https://leetcode.com/problems/range-sum-query-2d-immutable/discuss/75350/Clean-C%2B%2B-Solution-and-Explaination-O(mn)-space-with-O(1)-time)
 ```c++
 class NumMatrix {
 private:
@@ -5106,3 +5106,94 @@ public:
     }
 };
 ```
+[Remove Invalid Parentheses](https://www.youtube.com/watch?v=EE_9U798nvQ)
+```c++
+    // could use bfs to solve this
+    unordered_set<string> visited;
+    vector<string> removeInvalidParentheses(string s) {
+        if(check(s)) {
+            return {s};
+        }
+        vector<string> res;
+        queue<string> queue;
+        queue.push(s);
+        visited.insert(s);
+        
+        bool found = false;
+        while(!queue.empty() && !found) {
+            int size = queue.size();
+            while(--size >= 0){
+                string cur = queue.front(); queue.pop();
+                for(int i = 0; i < cur.length(); ++i) {
+                    if(cur[i] != '(' && cur[i] != ')') {
+                        continue;
+                    }
+                    string str = cur.substr(0, i) + cur.substr(i + 1);
+                    if(!visited.count(str)) {
+                        if(check(str)) {
+                            res.push_back(str);
+                            found = true;
+                        }
+                        queue.push(str);
+                        visited.insert(str);
+                    }
+                }
+            }
+        }
+        return res;
+    }
+    
+    bool check(string str) {
+        int cnt = 0;
+        for(int i = 0; i < str.length(); ++i) {
+            if(str[i] == '(') {
+                ++cnt;
+            } else if(str[i] == ')') {
+                if(cnt-- == 0) {
+                    return false;
+                }
+            }   
+        }
+        return cnt == 0;
+    }
+```
+
+[Trapping Rain Water](https://leetcode.com/problems/trapping-rain-water/submissions/)
+```c++
+    int trap(vector<int>& heights) {
+        if(heights.size() == 0) {
+            return 0;
+        }
+        // find heightest
+
+        int idx = findMax(heights), count = 0;
+        // search from left
+        int prevHighBar = 0, localCount = 0;
+        
+        for(int i = 0; i <= idx; ++i) {
+            int height = heights[i];
+            if(height >= prevHighBar) {
+                count += localCount;
+                localCount = 0;
+                prevHighBar = height;
+            } else if(height < prevHighBar) {
+                localCount += prevHighBar - height;
+            } 
+        }
+        
+        prevHighBar = 0, localCount = 0;
+        for(int i = heights.size() - 1; i >= idx; --i) {
+            int height = heights[i];
+            if(height >= prevHighBar) { // equal here is necessary
+                count += localCount;
+                localCount = 0;
+                prevHighBar = height;
+            } else if(height < prevHighBar) {
+                localCount += prevHighBar - height;
+            } 
+        }
+ 
+        return count;
+    }
+```
+[next permutation](https://leetcode.com/problems/next-permutation/discuss/13867/C%2B%2B-from-Wikipedia)

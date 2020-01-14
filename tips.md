@@ -1,20 +1,20 @@
 ### Tips
 
-- **The BEST interview feel like a nice conversation about a problem, and ***collaborating*** well with your interviewer is a good way to impress them**
+> **The BEST interview feel like a nice conversation about a problem, and ***collaborating*** well with your interviewer is a good way to impress them**
 
-#### behavior question 
-- tell me a story
-    - technical complexity
-    - impact (e.g. 5000 users)
-    - story
-- prepare 4 stories (not boring)
-    - story = *situation* + *task* + *action* + *resolve*
-    - (2 personal story) success failure collaboration goal (conflicts)
-    - 2 tech challenge
-        - (e.g.independent project like back end and front end communication)
-        - resume reference
-    - relaxed & humor
-    - **feedback** (self-reflect and other people) -> **improvement**
+- behavior question 
+    - tell me a story
+        - technical complexity
+        - impact (e.g. 5000 users)
+        - story
+    - prepare 4 stories (engaging)
+        - story = *situation* + *task* + *action* + *resolve*
+        - (2 personal story) success failure collaboration goal (conflicts)
+        - 2 tech challenge
+            - (e.g.independent project like back end and front end communication)
+            - resume reference
+        - relaxed & humor
+        - **feedback** (self-reflect and other people) -> **improvement**
 
 - coding
     - Procedure
@@ -53,7 +53,7 @@
 
 - Other/About Specific Questions
     - how you would handle the problem if the whole input is too large to fit into memory, or if the input arrives as a stream (scaling)
-        - divide-and-conquer approach — perform distributed processing of the data and only read certain chunks of the input from disk into memory, 
+        - *divide-and-conquer approach* — perform distributed processing of the data and only read certain chunks of the input from disk into memory, 
         - write the output back to disk and combine them later.
     - summation or multiplication of a subarray 
         - pre-computation using hashing or a prefix, suffix sum, or product
@@ -65,23 +65,23 @@
 #### More behavior questions
 
 - **why I code**
+    -  **impact** 
     - take us to different corners: work anyplace with only a laptop and dream/idea (no laboratory no employee no approval from anybody)
         - built *anything*: customization automation tooling user interface design and optimization
-    -  value challenged impact
-    -  motivated inspired empowered
+    -  value, challenged, impact
+    -  motivated, inspired, empowered
     -  innovation is everywhere (inspiring)
-    -  **collaboration** (meet so many different people marketing people support people design people)
+    -  **collaboration** (meet so many different people, marketing people, support people, design people etc.)
     -  problem-solving (creativity)
-    -  adapt to new things, new to learn and grab
-    -  **impact** 
+    -  adapt to new things, constantly learn
 
 - Why *Facebook*
     - core values: move fast, be bold, focus on impact, be open, and build social value
     - compared to Google, more fast-paced
-    - (1) inclusivity and cultivating ecosystems
-    - (2) empowering regular people and developers with open source tools
+    - inclusivity and cultivating ecosystems
+    - empowering regular people and developers with open source tools
         - greatly admire a company who sees the value in making open sourcing a core mission statement and puts so much effort into developing and maintaining its open source projects
-    - (3) company is entrepreneurial and always taking risks
+    - company is entrepreneurial and always taking risks
 
 - Why *Microsoft*
     - sample: "I’ve been using Microsoft software as long as I can remember, and I'm really impressed at how Microsoft manages to create a product that is universally excellent. For example, I’ve been using Visual Studio recently to do web dev, and it’s APIs are excellent."
@@ -97,7 +97,18 @@
     + Management structure
     + Working in a start up v.s. working in a big company
     + Do you have program managers? If there is a conflicts between developer and managers, how do you solve it?
-    + machine learning opportunities as an undergrad, algorithm design only for phd students? any opportunities for that area as an undergrad
+    + machine learning opportunities as an undergrad, algorithm design only for phd students? any opportunities for that part as an undergrad?
     + how's internal tools?
     + “What is the ratio of testers to developers to product managers? What is the interaction like? How does project planning happen on the team?”
+    + What kind of people besides developers would you meet in daily work
+    - would you collobrate w/ someone you don't want to work with? 
+    - motivation 
+    + plan for future 
+    + Is the business marketing, sales, product or engineering driven
+    - What's the biggest negative of working here? 
+    - How would you rate your codebase in terms of technical debt? 
+    - What's the hardest problem you(the interviewer) had to solve
+    - Do you have a culture of excellence and/or high-performance? What gets you to come to work in the morning (besides money, in finance firms that's a valid answer though)?
+    + team & plan
+
 

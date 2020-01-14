@@ -1,4 +1,4 @@
-#### Introduction
+### Introduction
 1. [Log Sorting](https://www.lintcode.com/problem/log-sorting/description?_from=ladder&&fromId=14)
     - Key: sort according to multiple situations
 ```c++
@@ -151,7 +151,7 @@ public:
         return decodeWays[s.length()];
     }
 ```
-**Related Problems**
+#### **Related Problems**
 - [Largest Number](https://www.lintcode.com/problem/largest-number/description?_from=ladder&&fromId=14)
 ```c++
 bool cmp(string & A, string & B) {
@@ -287,7 +287,7 @@ public:
     }
 ```
 
-#### Corner Cases 
+### Corner Cases 
 - [Missing Range](https://www.lintcode.com/problem/missing-ranges/?_from=ladder&&fromId=14)
     - Key: corner case when the array is empty and handle case like [214783674] 0 214783674 about overflow
 ```c++
@@ -478,7 +478,7 @@ double myPow(double x, long n) {
         return res;
     }
 ```
-**Related Problems**
+#### **Related Problems**
 - [String to Integer](https://www.lintcode.com/problem/string-to-integer-atoi/description?_from=ladder&&fromId=14)
 ```c++
     // this question is for corner cases 
@@ -584,7 +584,7 @@ public:
 };
 ```
 
-#### Hashing of chars
+### Hashing of chars
 1.[Find All Anagrams in a string](https://www.lintcode.com/problem/find-all-anagrams-in-a-string/?_from=ladder&&fromId=14)
 ```c++
     vector<int> findAnagrams(string &s, string &p) {
@@ -809,7 +809,7 @@ public:
         return longestLen;
     }
 ```
-**Related**
+#### **Related**
 - [Group Anagram](https://www.lintcode.com/problem/group-anagrams/description?_from=ladder&&fromId=14)
     - think about use what to be the key of the hash
 ```c++
@@ -893,7 +893,7 @@ public:
     }
 ```
 
-#### BFS 
+### BFS 
 1. [Walls and Gates](https://www.lintcode.com/problem/walls-and-gates/description?_from=ladder&&fromId=14)
 ```c++
     void wallsAndGates(vector<vector<int>> &rooms) {
@@ -1128,7 +1128,7 @@ public:
         return str;
     }
 ```
-**Related Problems**
+#### **Related Problems**
 - [Pacific Atlanta Water Flow](https://www.lintcode.com/problem/pacific-atlantic-water-flow/description?_from=ladder&&fromId=14)
 ```c++
     vector<vector<int>> pacificAtlantic(vector<vector<int>> &matrix) {
@@ -1289,7 +1289,7 @@ public:
     }
 ```
 
-#### Tree
+### Tree
 1. [Convert BST to Greater Tree](https://www.lintcode.com/problem/convert-bst-to-greater-tree/?_from=ladder&&fromId=14)
     - key: break bigger task into smaller task
 ```c++
@@ -1326,7 +1326,7 @@ public:
         }
     }
 ```
-3. [Binary Tree Upside Down]()
+3. [Binary Tree Upside Down](https://www.lintcode.com/problem/binary-tree-upside-down/description)
 ```c++
     //  https://www.cnblogs.com/grandyang/p/5172838.html
     TreeNode * upsideDownBinaryTree(TreeNode * root) {
@@ -1414,7 +1414,7 @@ public:
     }
 ```
 
-#### DFS
+### DFS
 1. [Word Squares](https://www.lintcode.com/problem/word-squares/description?_from=ladder&&fromId=14)
     - key: hash/Trie note down the prefix of words
     - only need to search from specific prefix words
@@ -1711,8 +1711,8 @@ public:
 ```
 
 
-#### More 
-**Union Find** Algorithm
+### More 
+#### **Union Find** Algorithm
 -  [Minimum Spanning Tree](https://www.lintcode.com/problem/minimum-spanning-tree/description?_from=ladder&&fromId=14)
 ```c++
 // /**
@@ -1897,7 +1897,7 @@ public:
 
 };
 ```
-**Segment Tree**
+#### **Segment Tree**
 - [Interval Sum](https://www.lintcode.com/problem/interval-sum/) 
 - [Segment Tree II](https://www.lintcode.com/problem/interval-sum-ii/description)
 ```c++
